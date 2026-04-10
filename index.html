@@ -43,6 +43,7 @@
   .btn-secondary{background:var(--blue-50);color:var(--blue-600);border:1.5px solid var(--blue-200);}
   .btn-danger{background:#fef2f2;color:var(--danger);border:1.5px solid #fecaca;}
   .btn-success{background:#ecfdf5;color:var(--success);border:1.5px solid #a7f3d0;}
+  .btn-warning{background:#fffbeb;color:#92400e;border:1.5px solid #fde68a;}
   .btn-full{width:100%;justify-content:center;}
   .btn-sm{padding:7px 12px;font-size:0.8rem;border-radius:8px;}
   .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:800;}
@@ -83,11 +84,15 @@
   .fc-btn-correct{background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:1rem;padding:16px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:var(--t);}
   .fc-btn-wrong{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;font-size:1rem;padding:16px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:var(--t);}
   .fc-btn-correct:active,.fc-btn-wrong:active{transform:scale(0.97);}
-  .fc-nav-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .fc-nav-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
   .fc-progress{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
   .fc-progress-bar{flex:1;height:8px;background:var(--blue-100);border-radius:10px;overflow:hidden;}
   .fc-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue-400),var(--blue-600));border-radius:10px;transition:width 0.4s ease;}
   .fc-progress-text{font-size:0.8rem;font-weight:700;color:var(--gray-500);white-space:nowrap;}
+  .fc-paused{text-align:center;padding:32px 20px;background:white;border-radius:var(--radius);border:2px solid var(--warning);box-shadow:var(--shadow);margin-bottom:16px;}
+  .fc-paused-icon{font-size:2.5rem;margin-bottom:8px;}
+  .fc-paused-title{font-size:1.1rem;font-weight:900;color:#92400e;margin-bottom:4px;}
+  .fc-paused-sub{font-size:0.85rem;color:var(--gray-500);margin-bottom:16px;}
   .fc-complete{text-align:center;padding:32px 20px;background:white;border-radius:var(--radius);border:2px solid var(--blue-100);box-shadow:var(--shadow);}
   .fc-complete-emoji{font-size:3rem;margin-bottom:12px;}
   .fc-complete-title{font-size:1.4rem;font-weight:900;color:var(--blue-700);margin-bottom:6px;}
@@ -103,10 +108,11 @@
   .sheets-banner-icon{font-size:1.8rem;flex-shrink:0;}
   .sheets-banner-text h4{font-size:0.92rem;font-weight:800;margin-bottom:2px;}
   .sheets-banner-text p{font-size:0.78rem;opacity:0.8;}
+  .sheets-banner-text .sync-time{font-size:0.72rem;opacity:0.7;margin-top:3px;}
   .sheets-status{display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:700;margin-top:6px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.15);}
   .sheets-actions{display:flex;gap:6px;margin-left:auto;flex-shrink:0;flex-direction:column;}
   .dot{width:7px;height:7px;border-radius:50%;}
-  .dot-green{background:#34d399;}.dot-yellow{background:#fbbf24;}.dot-red{background:#f87171;}
+  .dot-green{background:#34d399;}.dot-yellow{background:#fbbf24;}
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:200;backdrop-filter:blur(4px);}
   .modal-overlay.open{display:flex;align-items:flex-end;justify-content:center;animation:fadeIn 0.2s ease;}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -141,8 +147,6 @@
 </style>
 </head>
 <body>
-
-<!-- Loading overlay -->
 
 <div class="loading-overlay" id="loading-overlay">
   <div class="loading-spinner"></div>
@@ -193,6 +197,7 @@
       <h4>Google Sheets Sync</h4>
       <p>Auto-sync on add / edit / delete</p>
       <div class="sheets-status" id="sheets-status-badge"><div class="dot dot-yellow"></div> Not connected</div>
+      <div class="sync-time" id="sync-time-display"></div>
     </div>
     <div class="sheets-actions">
       <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;border:none;" onclick="openSheetsModal()">Setup</button>
@@ -215,6 +220,14 @@
 <div class="page" id="page-flashcard">
   <div id="fc-home">
     <div class="page-header"><div class="page-title">Flashcards</div><div class="page-sub">Choose your study mode</div></div>
+    <div id="fc-resume-banner" style="display:none;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;color:white;display:none;align-items:center;gap:12px;">
+      <div style="font-size:1.5rem;">⏸️</div>
+      <div style="flex:1;">
+        <div style="font-weight:800;font-size:0.92rem;">Session Paused</div>
+        <div style="font-size:0.78rem;opacity:0.85;" id="resume-info"></div>
+      </div>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.25);color:white;border:none;flex-shrink:0;" onclick="resumeSession()">▶ Resume</button>
+    </div>
     <div class="fc-mode-select">
       <div class="fc-mode-card" onclick="startMode('today')"><div class="fc-mode-icon">🔄</div><div><div class="fc-mode-title">Today's Review</div><div class="fc-mode-desc">Spaced repetition study</div></div></div>
       <div class="fc-mode-card" onclick="openCustomSelect()"><div class="fc-mode-icon">✏️</div><div><div class="fc-mode-title">Custom Selection</div><div class="fc-mode-desc">Pick words from your list</div></div></div>
@@ -244,8 +257,21 @@
       </div>
     </div>
     <div class="fc-nav-btns">
-      <button class="btn btn-secondary btn-full" id="fc-prev-btn" onclick="prevCard()" style="display:none;">← Previous</button>
-      <button class="btn btn-secondary btn-full" onclick="backToHome()">✕ End Session</button>
+      <button class="btn btn-secondary" id="fc-prev-btn" onclick="prevCard()" style="display:none;justify-content:center;">← Prev</button>
+      <button class="btn btn-warning" onclick="pauseSession()" style="justify-content:center;">⏸ Pause</button>
+      <button class="btn btn-danger" onclick="endSession()" style="justify-content:center;">✕ End</button>
+    </div>
+  </div>
+
+  <div id="fc-paused" style="display:none;">
+    <div class="fc-paused">
+      <div class="fc-paused-icon">⏸️</div>
+      <div class="fc-paused-title">Session Paused</div>
+      <div class="fc-paused-sub" id="paused-info"></div>
+      <div style="display:flex;gap:8px;flex-direction:column;">
+        <button class="btn btn-primary btn-full" onclick="resumeSession()">▶ Resume Session</button>
+        <button class="btn btn-danger btn-full" onclick="endSession()">✕ End Session</button>
+      </div>
     </div>
   </div>
 
@@ -270,6 +296,7 @@
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Select Words</div>
+    <input class="form-input" id="custom-search" placeholder="🔍 Search words..." style="margin-bottom:10px;" oninput="renderCustomSelectList()">
     <div class="filter-bar" id="custom-filter-bar">
       <button class="filter-btn active" onclick="setCustomFilter('all',this)">All</button>
       <button class="filter-btn" onclick="setCustomFilter('word',this)">Words</button>
@@ -277,7 +304,7 @@
       <button class="filter-btn" onclick="setCustomFilter('collocation',this)">Collocations</button>
       <button class="filter-btn" onclick="setCustomFilter('due',this)">📅 Due</button>
     </div>
-    <div id="custom-select-list"></div>
+    <div id="custom-select-list" style="max-height:300px;overflow-y:auto;"></div>
     <div style="display:flex;gap:8px;margin-top:12px;">
       <button class="btn btn-secondary" style="flex:1" onclick="closeModal('modal-custom')">Cancel</button>
       <button class="btn btn-primary" style="flex:1" onclick="startCustomSession()">Start ▶</button>
@@ -292,6 +319,7 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Save as Set</div>
     <div class="form-group"><label class="form-label">Set Name</label><input class="form-input" id="set-name-input" placeholder="e.g. IELTS Week 1"></div>
+    <input class="form-input" id="save-set-search" placeholder="🔍 Search words..." style="margin-bottom:10px;" oninput="renderSaveSetList()">
     <div class="filter-bar" id="save-set-filter-bar">
       <button class="filter-btn active" onclick="setSaveSetFilter('all',this)">All</button>
       <button class="filter-btn" onclick="setSaveSetFilter('word',this)">Words</button>
@@ -314,6 +342,7 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Edit Vocabulary</div>
     <input type="hidden" id="edit-id">
+    <input type="hidden" id="edit-date-added">
     <div class="form-group"><label class="form-label">Word / Phrase *</label><input class="form-input" id="edit-word"></div>
     <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="edit-type"><option value="word">Word</option><option value="idiom">Idiom</option><option value="collocation">Collocation</option></select></div>
     <div class="form-group"><label class="form-label">Definition</label><textarea class="form-textarea" id="edit-def"></textarea></div>
@@ -327,25 +356,15 @@
   </div>
 </div>
 
-<!-- MODAL: Sheets Setup -->
+<!-- MODAL: Sheets -->
 
 <div class="modal-overlay" id="modal-sheets">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">📊 Google Sheets Setup</div>
     <div id="sheets-setup-form">
-      <p style="font-size:0.88rem;color:var(--gray-600);margin-bottom:16px;">Connect to Google Sheets for automatic sync and iPhone↔iPad sharing.</p>
-      <div class="setup-step"><div class="step-num">1</div><div class="step-content"><p>Open your <strong>Google Sheet → Extensions → Apps Script</strong></p></div></div>
-      <div class="setup-step"><div class="step-num">2</div><div class="step-content"><p>Replace all code with the new script (see below), deploy as Web App with <strong>Execute as: Me, Access: Anyone</strong>.</p></div></div>
-      <div class="setup-step"><div class="step-num">3</div><div class="step-content"><p>Paste the <strong>Web App URL</strong> and optionally your <strong>Google Sheet URL</strong> below.</p></div></div>
-      <div class="form-group">
-        <label class="form-label">Web App URL *</label>
-        <input class="form-input" id="sheets-url" placeholder="https://script.google.com/macros/s/.../exec">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Google Sheet URL (optional — for quick access)</label>
-        <input class="form-input" id="sheets-open-url" placeholder="https://docs.google.com/spreadsheets/d/...">
-      </div>
+      <div class="form-group"><label class="form-label">Web App URL *</label><input class="form-input" id="sheets-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div class="form-group"><label class="form-label">Google Sheet URL (optional)</label><input class="form-input" id="sheets-open-url" placeholder="https://docs.google.com/spreadsheets/d/..."></div>
       <div id="sheets-error" style="display:none;color:var(--danger);font-size:0.82rem;font-weight:700;margin-bottom:10px;padding:10px;background:#fef2f2;border-radius:8px;"></div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-secondary" style="flex:1" onclick="closeModal('modal-sheets')">Cancel</button>
@@ -370,11 +389,14 @@ let vocab = JSON.parse(localStorage.getItem('vm_vocab') || '[]');
 let savedSets = JSON.parse(localStorage.getItem('vm_sets') || '[]');
 let sheetsUrl = localStorage.getItem('vm_sheets_url') || '';
 let sheetsOpenUrl = localStorage.getItem('vm_sheets_open_url') || '';
+let lastSyncTime = localStorage.getItem('vm_last_sync') || '';
 let currentFilter = 'all';
 let customFilter = 'all';
 let saveSetFilter = 'all';
 let fcQueue = [], fcIndex = 0, fcCorrect = 0, fcWrong = 0;
-let fcAnswered = []; // track answered cards for prev navigation
+let fcAnswered = [];
+let fcPaused = false;
+let pausedSession = null;
 let selectedWords = [], saveSetSelected = [];
 const SR = [1,3,7,14,30,90];
 
@@ -382,6 +404,11 @@ function save() { localStorage.setItem('vm_vocab', JSON.stringify(vocab)); }
 function saveSets() { localStorage.setItem('vm_sets', JSON.stringify(savedSets)); }
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
 function today() { return new Date().toISOString().split('T')[0]; }
+function nowStr() {
+  const d = new Date();
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' +
+    d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
 function nextReviewDate(v) {
   const lvl = Math.min(v.correct||0, SR.length-1);
   const d = new Date(); d.setDate(d.getDate()+SR[lvl]);
@@ -393,40 +420,41 @@ function isDue(v) { return !v.nextReview || new Date(v.nextReview) <= new Date()
 function sheetsSend(params) {
   if (!sheetsUrl) return;
   const url = sheetsUrl + '?' + Object.entries(params)
-    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v||''))
+    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v==null?'':v))
     .join('&');
-  fetch(url)
-    .then(r => r.json())
-    .then(data => { if (data.status === 'ok') updateSheetsBadge(true); })
-    .catch(() => {});
+  fetch(url).then(r=>r.json()).then(data=>{
+    if(data.status==='ok') updateSheetsBadge(true);
+  }).catch(()=>{});
 }
 
 async function loadFromSheets() {
   if (!sheetsUrl) { showToast('Please connect Google Sheets first.'); return; }
   document.getElementById('loading-overlay').classList.add('show');
   try {
-    const url = sheetsUrl + '?action=getAll';
-    const res = await fetch(url);
+    const res = await fetch(sheetsUrl + '?action=getAll');
     const data = await res.json();
     if (data.status === 'ok' && Array.isArray(data.vocab)) {
       vocab = data.vocab.map(v => ({
         id: v.id || genId(),
-        word: v.word || '',
-        type: v.type || 'word',
-        definition: v.definition || '',
-        example: v.example || '',
-        usage: v.usage || '',
-        notes: v.notes || '',
-        dateAdded: v.dateAdded || today(),
+        word: String(v.word||''),
+        type: String(v.type||'word'),
+        definition: String(v.definition||''),
+        example: String(v.example||''),
+        usage: String(v.usage||''),
+        notes: String(v.notes||''),
+        dateAdded: String(v.dateAdded||today()),
         correct: parseInt(v.correct)||0,
         wrong: parseInt(v.wrong)||0,
-        lastReview: v.lastReview || '',
-        nextReview: v.nextReview || ''
-      }));
+        lastReview: String(v.lastReview||''),
+        nextReview: String(v.nextReview||'')
+      })).filter(v=>v.word);
       save();
+      lastSyncTime = nowStr();
+      localStorage.setItem('vm_last_sync', lastSyncTime);
+      updateSyncTimeDisplay();
       renderList(); updateStats();
       updateSheetsBadge(true);
-      showToast('✅ Synced from Google Sheets! ' + vocab.length + ' words loaded.');
+      showToast('✅ Synced! ' + vocab.length + ' words loaded.');
     } else {
       showToast('⚠️ Could not load data from Sheets.');
     }
@@ -434,6 +462,11 @@ async function loadFromSheets() {
     showToast('⚠️ Sync failed. Check your connection.');
   }
   document.getElementById('loading-overlay').classList.remove('show');
+}
+
+function updateSyncTimeDisplay() {
+  const el = document.getElementById('sync-time-display');
+  if (el) el.textContent = lastSyncTime ? 'Last sync: ' + lastSyncTime : '';
 }
 
 function openSheetsModal() {
@@ -451,10 +484,8 @@ function openSheetsModal() {
 function connectSheets() {
   const url = document.getElementById('sheets-url').value.trim();
   const openUrl = document.getElementById('sheets-open-url').value.trim();
-  const err = document.getElementById('sheets-error');
-  if (!url) { err.textContent='Please enter the Web App URL.'; err.style.display='block'; return; }
-  sheetsUrl = url;
-  sheetsOpenUrl = openUrl;
+  if (!url) { document.getElementById('sheets-error').textContent='Please enter the Web App URL.'; document.getElementById('sheets-error').style.display='block'; return; }
+  sheetsUrl = url; sheetsOpenUrl = openUrl;
   localStorage.setItem('vm_sheets_url', url);
   if (openUrl) localStorage.setItem('vm_sheets_open_url', openUrl);
   document.getElementById('sheets-setup-form').style.display = 'none';
@@ -466,19 +497,16 @@ function connectSheets() {
   loadFromSheets();
 }
 function disconnectSheets() {
-  sheetsUrl = ''; sheetsOpenUrl = '';
-  localStorage.removeItem('vm_sheets_url');
-  localStorage.removeItem('vm_sheets_open_url');
+  sheetsUrl=''; sheetsOpenUrl='';
+  localStorage.removeItem('vm_sheets_url'); localStorage.removeItem('vm_sheets_open_url');
   updateSheetsBadge(false); closeModal('modal-sheets');
-  showToast('Disconnected from Google Sheets.');
+  showToast('Disconnected.');
 }
-function openGoogleSheet() {
-  if (sheetsOpenUrl) window.open(sheetsOpenUrl, '_blank');
-}
+function openGoogleSheet() { if(sheetsOpenUrl) window.open(sheetsOpenUrl,'_blank'); }
 function updateSheetsBadge(ok) {
   const b = document.getElementById('sheets-status-badge');
   b.innerHTML = sheetsUrl
-    ? (ok ? '<div class="dot dot-green"></div> Synced' : '<div class="dot dot-yellow"></div> Connected')
+    ? (ok?'<div class="dot dot-green"></div> Synced':'<div class="dot dot-yellow"></div> Connected')
     : '<div class="dot dot-yellow"></div> Not connected';
 }
 
@@ -490,37 +518,37 @@ function showPage(p) {
   const lbl={register:'Add',list:'List',flashcard:'Cards'};
   document.querySelectorAll('.nav-tab').forEach(b=>{if(b.textContent.trim().includes(lbl[p]))b.classList.add('active');});
   if(p==='list'){renderList();updateStats();}
-  if(p==='flashcard')backToHome();
+  if(p==='flashcard'){updateResumeBanner();}
 }
 
 // ===== REGISTER =====
 function registerWord() {
-  const word = document.getElementById('reg-word').value.trim();
-  const def = document.getElementById('reg-def').value.trim();
-  if (!word||!def) { showToast('Please fill in Word and Definition.'); return; }
-  const entry = {
-    id: genId(), word, type: document.getElementById('reg-type').value,
-    definition: def, example: document.getElementById('reg-example').value.trim(),
-    usage: document.getElementById('reg-usage').value.trim(),
-    notes: document.getElementById('reg-notes').value.trim(),
-    dateAdded: today(), correct:0, wrong:0, lastReview:'', nextReview:''
+  const word=document.getElementById('reg-word').value.trim();
+  const def=document.getElementById('reg-def').value.trim();
+  if(!word||!def){showToast('Please fill in Word and Definition.');return;}
+  const entry={
+    id:genId(),word,type:document.getElementById('reg-type').value,
+    definition:def,example:document.getElementById('reg-example').value.trim(),
+    usage:document.getElementById('reg-usage').value.trim(),
+    notes:document.getElementById('reg-notes').value.trim(),
+    dateAdded:today(),correct:0,wrong:0,lastReview:'',nextReview:''
   };
   vocab.push(entry); save();
   ['reg-word','reg-def','reg-example','reg-usage','reg-notes'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('reg-type').value='word';
   showToast('✅ "'+word+'" saved!');
-  sheetsSend({action:'add', id:entry.id, word:entry.word, type:entry.type, definition:entry.definition,
-    example:entry.example, usage:entry.usage, notes:entry.notes, dateAdded:entry.dateAdded,
-    correct:0, wrong:0, lastReview:'', nextReview:''});
+  sheetsSend({action:'add',word:entry.word,type:entry.type,definition:entry.definition,
+    example:entry.example,usage:entry.usage,notes:entry.notes,dateAdded:entry.dateAdded,
+    correct:0,wrong:0,lastReview:'',nextReview:''});
 }
 
 // ===== LIST =====
-function setFilter(f,el) {
+function setFilter(f,el){
   currentFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#page-list .filter-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active'); renderList();
 }
-function renderList() {
+function renderList(){
   const search=(document.getElementById('list-search').value||'').toLowerCase();
   let items=vocab.filter(v=>{
     if(currentFilter==='word'&&v.type!=='word')return false;
@@ -549,20 +577,21 @@ function renderList() {
   }).join('');
 }
 function toggleExpand(id){document.getElementById('detail-'+id).classList.toggle('open');}
-function updateStats() {
+function updateStats(){
   document.getElementById('stat-total').textContent=vocab.length;
   document.getElementById('stat-due').textContent=vocab.filter(isDue).length;
   document.getElementById('stat-mastered').textContent=vocab.filter(v=>(v.correct||0)>=5).length;
 }
-function deleteWord(id) {
+function deleteWord(id){
   if(!confirm('Delete this word?'))return;
   const v=vocab.find(x=>x.id===id);
   vocab=vocab.filter(x=>x.id!==id); save(); renderList(); updateStats();
-  if(v) sheetsSend({action:'delete', id:v.id, word:v.word, dateAdded:v.dateAdded});
+  if(v) sheetsSend({action:'delete',word:v.word,dateAdded:v.dateAdded});
 }
-function openEdit(id) {
+function openEdit(id){
   const v=vocab.find(x=>x.id===id); if(!v)return;
   document.getElementById('edit-id').value=id;
+  document.getElementById('edit-date-added').value=v.dateAdded;
   document.getElementById('edit-word').value=v.word;
   document.getElementById('edit-type').value=v.type;
   document.getElementById('edit-def').value=v.definition;
@@ -571,9 +600,10 @@ function openEdit(id) {
   document.getElementById('edit-notes').value=v.notes||'';
   openModal('modal-edit');
 }
-function saveEdit() {
+function saveEdit(){
   const id=document.getElementById('edit-id').value;
   const v=vocab.find(x=>x.id===id); if(!v)return;
+  const oldWord=v.word; const oldDate=v.dateAdded;
   v.word=document.getElementById('edit-word').value.trim();
   v.type=document.getElementById('edit-type').value;
   v.definition=document.getElementById('edit-def').value.trim();
@@ -581,126 +611,139 @@ function saveEdit() {
   v.usage=document.getElementById('edit-usage').value.trim();
   v.notes=document.getElementById('edit-notes').value.trim();
   save(); closeModal('modal-edit'); renderList();
-  sheetsSend({action:'update', id:v.id, word:v.word, type:v.type, definition:v.definition,
-    example:v.example, usage:v.usage, notes:v.notes, dateAdded:v.dateAdded,
-    correct:v.correct||0, wrong:v.wrong||0, lastReview:v.lastReview||'', nextReview:v.nextReview||''});
-  showToast('✅ Updated!');
+  // Send update with original word+date for matching, plus all new values
+  sheetsSend({action:'update',word:v.word,type:v.type,definition:v.definition,
+    example:v.example,usage:v.usage,notes:v.notes,dateAdded:v.dateAdded,
+    correct:v.correct||0,wrong:v.wrong||0,lastReview:v.lastReview||'',nextReview:v.nextReview||'',
+    originalWord:oldWord,originalDate:oldDate});
+  showToast('✅ Updated and synced!');
 }
 
 // ===== FLASHCARD =====
-function setCustomFilter(f, el) {
-  customFilter = f;
-  document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderCustomSelectList();
+function updateResumeBanner(){
+  const banner=document.getElementById('fc-resume-banner');
+  if(pausedSession){
+    banner.style.display='flex';
+    document.getElementById('resume-info').textContent=
+      (fcQueue.length-fcIndex)+' cards remaining · '+fcCorrect+' correct, '+fcWrong+' incorrect';
+  } else {
+    banner.style.display='none';
+  }
 }
-function renderCustomSelectList() {
-  const items = vocab.filter(v => {
-    if(customFilter==='word') return v.type==='word';
-    if(customFilter==='idiom') return v.type==='idiom';
-    if(customFilter==='collocation') return v.type==='collocation';
-    if(customFilter==='due') return isDue(v);
+function setCustomFilter(f,el){
+  customFilter=f;
+  document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); renderCustomSelectList();
+}
+function renderCustomSelectList(){
+  const search=(document.getElementById('custom-search').value||'').toLowerCase();
+  const items=vocab.filter(v=>{
+    if(customFilter==='word'&&v.type!=='word')return false;
+    if(customFilter==='idiom'&&v.type!=='idiom')return false;
+    if(customFilter==='collocation'&&v.type!=='collocation')return false;
+    if(customFilter==='due'&&!isDue(v))return false;
+    if(search&&!v.word.toLowerCase().includes(search)&&!v.definition.toLowerCase().includes(search))return false;
     return true;
   });
-  document.getElementById('custom-select-list').innerHTML = items.length
-    ? items.map(v=>`<div class="select-item" onclick="toggleSel('${v.id}','chk-${v.id}',0)">
-        <div class="select-checkbox" id="chk-${v.id}">${selectedWords.includes(v.id)?'✓':''}</div>
+  const c=document.getElementById('custom-select-list');
+  c.innerHTML=items.length
+    ?items.map(v=>`<div class="select-item" onclick="toggleSel('${v.id}','chk-${v.id}',0)">
+        <div class="select-checkbox" id="chk-${v.id}"></div>
         <div><div style="font-weight:700;color:var(--blue-700)">${v.word}</div><div style="font-size:0.78rem;color:var(--gray-400)">${v.definition.substring(0,50)}…</div></div>
       </div>`).join('')
-    : '<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
-  // restore checked state
-  selectedWords.forEach(id => {
-    const chk = document.getElementById('chk-'+id);
-    if(chk) { chk.classList.add('checked'); chk.textContent='✓'; }
-  });
+    :'<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
+  selectedWords.forEach(id=>{const chk=document.getElementById('chk-'+id);if(chk){chk.classList.add('checked');chk.textContent='✓';}});
 }
-function setSaveSetFilter(f, el) {
-  saveSetFilter = f;
+function setSaveSetFilter(f,el){
+  saveSetFilter=f;
   document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderSaveSetList();
+  el.classList.add('active'); renderSaveSetList();
 }
-function renderSaveSetList() {
-  const items = vocab.filter(v => {
-    if(saveSetFilter==='word') return v.type==='word';
-    if(saveSetFilter==='idiom') return v.type==='idiom';
-    if(saveSetFilter==='collocation') return v.type==='collocation';
-    if(saveSetFilter==='due') return isDue(v);
+function renderSaveSetList(){
+  const search=(document.getElementById('save-set-search').value||'').toLowerCase();
+  const items=vocab.filter(v=>{
+    if(saveSetFilter==='word'&&v.type!=='word')return false;
+    if(saveSetFilter==='idiom'&&v.type!=='idiom')return false;
+    if(saveSetFilter==='collocation'&&v.type!=='collocation')return false;
+    if(saveSetFilter==='due'&&!isDue(v))return false;
+    if(search&&!v.word.toLowerCase().includes(search))return false;
     return true;
   });
-  document.getElementById('save-set-select-list').innerHTML = items.length
-    ? items.map(v=>`<div class="select-item" onclick="toggleSel('${v.id}','ss-${v.id}',1)">
+  const c=document.getElementById('save-set-select-list');
+  c.innerHTML=items.length
+    ?items.map(v=>`<div class="select-item" onclick="toggleSel('${v.id}','ss-${v.id}',1)">
         <div class="select-checkbox" id="ss-${v.id}"></div>
         <div><div style="font-weight:700;color:var(--blue-700)">${v.word}</div></div>
       </div>`).join('')
-    : '<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
-  saveSetSelected.forEach(id => {
-    const chk = document.getElementById('ss-'+id);
-    if(chk) { chk.classList.add('checked'); chk.textContent='✓'; }
-  });
+    :'<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
+  saveSetSelected.forEach(id=>{const chk=document.getElementById('ss-'+id);if(chk){chk.classList.add('checked');chk.textContent='✓';}});
 }
-
-function startMode(mode) {
+function startMode(mode){
   const q=mode==='today'?vocab.filter(isDue):vocab;
   if(!q.length){showToast('🎉 No words due today!');return;}
   startSession(q);
 }
-function openCustomSelect() {
+function openCustomSelect(){
   if(!vocab.length){showToast('No vocabulary saved yet.');return;}
   selectedWords=[]; customFilter='all';
+  document.getElementById('custom-search').value='';
   document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('#custom-filter-bar .filter-btn').classList.add('active');
-  renderCustomSelectList();
-  openModal('modal-custom');
+  renderCustomSelectList(); openModal('modal-custom');
 }
-function toggleSel(id,chkId,mode) {
+function toggleSel(id,chkId,mode){
   const arr=mode===0?selectedWords:saveSetSelected;
   const chk=document.getElementById(chkId);
   if(arr.includes(id)){arr.splice(arr.indexOf(id),1);chk.classList.remove('checked');chk.textContent='';}
   else{arr.push(id);chk.classList.add('checked');chk.textContent='✓';}
 }
-function startCustomSession() {
+function startCustomSession(){
   if(!selectedWords.length){showToast('Select at least one word.');return;}
   closeModal('modal-custom'); startSession(vocab.filter(v=>selectedWords.includes(v.id)));
 }
-function toggleSavedSets() {
+function toggleSavedSets(){
   const s=document.getElementById('saved-sets-section');
   s.style.display=s.style.display==='none'?'block':'none'; renderSavedSets();
 }
-function renderSavedSets() {
+function renderSavedSets(){
   const c=document.getElementById('sets-list-container');
   if(!savedSets.length){c.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text">No saved sets yet</div></div>';return;}
   c.innerHTML=savedSets.map((s,i)=>`<div class="set-item"><div><div class="set-name">${s.name}</div><div class="set-count">${s.ids.length} words · ${s.created}</div></div><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-primary" onclick="startSetSession(${i})">▶ Start</button><button class="btn btn-sm btn-danger" onclick="deleteSet(${i})">🗑️</button></div></div>`).join('');
 }
-function startSetSession(i) {
+function startSetSession(i){
   const q=vocab.filter(v=>savedSets[i].ids.includes(v.id));
   document.getElementById('saved-sets-section').style.display='none'; startSession(q);
 }
 function deleteSet(i){if(!confirm('Delete this set?'))return;savedSets.splice(i,1);saveSets();renderSavedSets();}
-function openSaveSetModal() {
+function openSaveSetModal(){
   saveSetSelected=[]; saveSetFilter='all';
   document.getElementById('set-name-input').value='';
+  document.getElementById('save-set-search').value='';
   document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('#save-set-filter-bar .filter-btn').classList.add('active');
-  renderSaveSetList();
-  openModal('modal-save-set');
+  renderSaveSetList(); openModal('modal-save-set');
 }
-function saveSet() {
+function saveSet(){
   const name=document.getElementById('set-name-input').value.trim();
   if(!name){showToast('Enter a set name.');return;}
   if(!saveSetSelected.length){showToast('Select at least one word.');return;}
   savedSets.push({name,ids:[...saveSetSelected],created:today()});
   saveSets(); closeModal('modal-save-set'); renderSavedSets(); showToast('📚 Set saved!');
 }
-function startSession(queue) {
+
+function startSession(queue){
+  pausedSession=null;
   fcQueue=[...queue].sort(()=>Math.random()-0.5);
   fcIndex=0; fcCorrect=0; fcWrong=0; fcAnswered=[];
+  showSessionScreen(); showCard();
+}
+function showSessionScreen(){
   document.getElementById('fc-home').style.display='none';
+  document.getElementById('fc-paused').style.display='none';
   document.getElementById('fc-complete').style.display='none';
   document.getElementById('fc-session').style.display='block';
-  showCard();
 }
-function showCard() {
+function showCard(){
   const v=fcQueue[fcIndex];
   document.getElementById('fc-card-label').textContent=v.type.toUpperCase();
   document.getElementById('fc-card-word').textContent=v.word;
@@ -710,48 +753,70 @@ function showCard() {
   document.getElementById('fc-hint').textContent='Tap to reveal definition';
   document.getElementById('fc-answer').classList.remove('show');
   document.getElementById('fc-action-btns').style.display='none';
-  document.getElementById('fc-prev-btn').style.display=fcIndex>0?'flex':'none';
+  const prevBtn=document.getElementById('fc-prev-btn');
+  prevBtn.style.display=fcIndex>0?'flex':'none';
   const pct=Math.round((fcIndex/fcQueue.length)*100);
   document.getElementById('fc-prog-fill').style.width=pct+'%';
   document.getElementById('fc-prog-text').textContent=(fcIndex+1)+' / '+fcQueue.length;
 }
-function revealCard() {
+function revealCard(){
   document.getElementById('fc-answer').classList.add('show');
   document.getElementById('fc-hint').style.display='none';
   document.getElementById('fc-action-btns').style.display='block';
 }
-function prevCard() {
-  if(fcIndex<=0) return;
-  // undo last answer
-  const last = fcAnswered.pop();
-  if(last !== undefined) {
-    const entry = vocab.find(x=>x.id===fcQueue[fcIndex-1].id);
-    if(entry) {
-      if(last===true) { entry.correct=Math.max(0,(entry.correct||1)-1); fcCorrect--; }
-      else { entry.wrong=Math.max(0,(entry.wrong||1)-1); fcWrong--; }
+function prevCard(){
+  if(fcIndex<=0)return;
+  const last=fcAnswered.pop();
+  if(last!==undefined){
+    const entry=vocab.find(x=>x.id===fcQueue[fcIndex-1].id);
+    if(entry){
+      if(last===true){entry.correct=Math.max(0,(entry.correct||1)-1);fcCorrect--;}
+      else{entry.wrong=Math.max(0,(entry.wrong||1)-1);fcWrong--;}
       save();
     }
   }
-  fcIndex--;
-  showCard();
+  fcIndex--; showCard();
 }
-function recordAnswer(correct) {
+function recordAnswer(correct){
   const entry=vocab.find(x=>x.id===fcQueue[fcIndex].id);
   if(entry){
     if(correct){entry.correct=(entry.correct||0)+1;fcCorrect++;}
     else{entry.wrong=(entry.wrong||0)+1;fcWrong++;}
     entry.lastReview=today(); entry.nextReview=nextReviewDate(entry); save();
     fcAnswered.push(correct);
-    sheetsSend({action:'update', id:entry.id, word:entry.word, type:entry.type,
-      definition:entry.definition, example:entry.example||'', usage:entry.usage||'',
-      notes:entry.notes||'', dateAdded:entry.dateAdded,
-      correct:entry.correct, wrong:entry.wrong,
-      lastReview:entry.lastReview, nextReview:entry.nextReview});
+    sheetsSend({action:'update',word:entry.word,type:entry.type,definition:entry.definition,
+      example:entry.example||'',usage:entry.usage||'',notes:entry.notes||'',
+      dateAdded:entry.dateAdded,correct:entry.correct,wrong:entry.wrong,
+      lastReview:entry.lastReview,nextReview:entry.nextReview,
+      originalWord:entry.word,originalDate:entry.dateAdded});
   }
   fcIndex++;
   if(fcIndex>=fcQueue.length) showComplete(); else showCard();
 }
-function showComplete() {
+function pauseSession(){
+  pausedSession={fcQueue,fcIndex,fcCorrect,fcWrong,fcAnswered:[...fcAnswered]};
+  document.getElementById('fc-session').style.display='none';
+  document.getElementById('fc-paused').style.display='block';
+  document.getElementById('paused-info').textContent=
+    (fcQueue.length-fcIndex)+' cards remaining · '+fcCorrect+' correct, '+fcWrong+' incorrect';
+}
+function resumeSession(){
+  if(!pausedSession)return;
+  fcQueue=pausedSession.fcQueue;
+  fcIndex=pausedSession.fcIndex;
+  fcCorrect=pausedSession.fcCorrect;
+  fcWrong=pausedSession.fcWrong;
+  fcAnswered=pausedSession.fcAnswered;
+  pausedSession=null;
+  showSessionScreen(); showCard();
+  updateResumeBanner();
+}
+function endSession(){
+  pausedSession=null;
+  backToHome();
+}
+function showComplete(){
+  pausedSession=null;
   document.getElementById('fc-session').style.display='none';
   document.getElementById('fc-complete').style.display='block';
   document.getElementById('score-correct').textContent=fcCorrect;
@@ -761,11 +826,13 @@ function showComplete() {
   document.getElementById('fc-complete-sub').textContent=
     pct>=80?'🌟 Excellent! '+pct+'% accuracy!':pct>=60?'👍 Good work! '+pct+'% accuracy.':'💪 Keep practicing! '+pct+'% accuracy.';
 }
-function backToHome() {
+function backToHome(){
   document.getElementById('fc-session').style.display='none';
+  document.getElementById('fc-paused').style.display='none';
   document.getElementById('fc-complete').style.display='none';
   document.getElementById('fc-home').style.display='block';
   document.getElementById('saved-sets-section').style.display='none';
+  updateResumeBanner();
 }
 
 // ===== MODAL =====
@@ -774,7 +841,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');doc
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);});});
 
 // ===== TOAST =====
-function showToast(msg) {
+function showToast(msg){
   let t=document.getElementById('toast');
   if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:40px;font-size:0.88rem;font-weight:700;z-index:999;font-family:Nunito,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.2);transition:opacity 0.3s;white-space:nowrap;max-width:90vw;text-align:center;';document.body.appendChild(t);}
   t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2800);
@@ -782,6 +849,7 @@ function showToast(msg) {
 
 // ===== INIT =====
 if(sheetsUrl) updateSheetsBadge(true);
+updateSyncTimeDisplay();
 renderList(); updateStats();
 </script>
 
