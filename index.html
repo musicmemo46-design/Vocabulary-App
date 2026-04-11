@@ -10,7 +10,7 @@
   :root {
     --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;--blue-300:#93c5fd;
     --blue-400:#60a5fa;--blue-500:#3b82f6;--blue-600:#2563eb;--blue-700:#1d4ed8;
-    --blue-800:#1e40af;--navy:#0f172a;--gray-50:#f8fafc;--gray-200:#e2e8f0;
+    --blue-800:#1e40af;--navy:#0f172a;--gray-200:#e2e8f0;
     --gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;
     --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
     --radius:16px;--radius-sm:10px;
@@ -71,6 +71,7 @@
   .fc-mode-icon{font-size:1.8rem;flex-shrink:0;}
   .fc-mode-title{font-size:1rem;font-weight:800;color:var(--blue-700);margin-bottom:2px;}
   .fc-mode-desc{font-size:0.82rem;color:var(--gray-500);}
+  .resume-banner{background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;color:white;display:flex;align-items:center;gap:12px;}
   .flashcard{background:white;border-radius:20px;padding:36px 24px;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow-lg);border:2px solid var(--blue-100);cursor:pointer;transition:var(--t);margin-bottom:20px;}
   .flashcard:active{transform:scale(0.98);}
   .fc-label{font-size:0.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--blue-300);margin-bottom:10px;}
@@ -84,15 +85,11 @@
   .fc-btn-correct{background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:1rem;padding:16px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:var(--t);}
   .fc-btn-wrong{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;font-size:1rem;padding:16px;border-radius:14px;border:none;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:var(--t);}
   .fc-btn-correct:active,.fc-btn-wrong:active{transform:scale(0.97);}
-  .fc-nav-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+  .fc-nav-btns{display:flex;gap:8px;margin-bottom:12px;}
   .fc-progress{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
   .fc-progress-bar{flex:1;height:8px;background:var(--blue-100);border-radius:10px;overflow:hidden;}
   .fc-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue-400),var(--blue-600));border-radius:10px;transition:width 0.4s ease;}
   .fc-progress-text{font-size:0.8rem;font-weight:700;color:var(--gray-500);white-space:nowrap;}
-  .fc-paused{text-align:center;padding:32px 20px;background:white;border-radius:var(--radius);border:2px solid var(--warning);box-shadow:var(--shadow);margin-bottom:16px;}
-  .fc-paused-icon{font-size:2.5rem;margin-bottom:8px;}
-  .fc-paused-title{font-size:1.1rem;font-weight:900;color:#92400e;margin-bottom:4px;}
-  .fc-paused-sub{font-size:0.85rem;color:var(--gray-500);margin-bottom:16px;}
   .fc-complete{text-align:center;padding:32px 20px;background:white;border-radius:var(--radius);border:2px solid var(--blue-100);box-shadow:var(--shadow);}
   .fc-complete-emoji{font-size:3rem;margin-bottom:12px;}
   .fc-complete-title{font-size:1.4rem;font-weight:900;color:var(--blue-700);margin-bottom:6px;}
@@ -134,10 +131,6 @@
   .select-item:active{background:var(--blue-50);}
   .select-checkbox{width:20px;height:20px;border-radius:6px;border:2px solid var(--blue-300);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--t);}
   .select-checkbox.checked{background:var(--blue-600);border-color:var(--blue-600);color:white;font-size:0.75rem;}
-  .setup-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
-  .step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-600);color:white;font-weight:900;font-size:0.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .step-content p{font-size:0.88rem;color:var(--gray-600);line-height:1.5;}
-  .step-content strong{color:var(--blue-700);}
   .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.9);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
   .loading-overlay.show{display:flex;}
   .loading-spinner{width:40px;height:40px;border:4px solid var(--blue-100);border-top-color:var(--blue-600);border-radius:50%;animation:spin 0.8s linear infinite;}
@@ -220,7 +213,7 @@
 <div class="page" id="page-flashcard">
   <div id="fc-home">
     <div class="page-header"><div class="page-title">Flashcards</div><div class="page-sub">Choose your study mode</div></div>
-    <div id="fc-resume-banner" style="display:none;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;color:white;display:none;align-items:center;gap:12px;">
+    <div id="fc-resume-banner" style="display:none;" class="resume-banner">
       <div style="font-size:1.5rem;">⏸️</div>
       <div style="flex:1;">
         <div style="font-weight:800;font-size:0.92rem;">Session Paused</div>
@@ -243,7 +236,7 @@
   </div>
 
   <div id="fc-session" style="display:none;">
-    <div class="fc-progress"><div class="fc-progress-bar"><div class="fc-progress-fill" id="fc-prog-fill" style="width:0%"></div></div><div class="fc-progress-text" id="fc-prog-text">0 / 0</div></div>
+    <div class="fc-progress"><div class="fc-progress-bar"><div class="fc-progress-fill" id="fc-prog-fill" style="width:0%"></div></div><div class="fc-progress-text" id="fc-prog-text">1 / 0</div></div>
     <div class="flashcard" onclick="revealCard()">
       <div class="fc-label" id="fc-card-label">WORD</div>
       <div class="fc-word" id="fc-card-word">—</div>
@@ -257,21 +250,9 @@
       </div>
     </div>
     <div class="fc-nav-btns">
-      <button class="btn btn-secondary" id="fc-prev-btn" onclick="prevCard()" style="display:none;justify-content:center;">← Prev</button>
-      <button class="btn btn-warning" onclick="pauseSession()" style="justify-content:center;">⏸ Pause</button>
-      <button class="btn btn-danger" onclick="endSession()" style="justify-content:center;">✕ End</button>
-    </div>
-  </div>
-
-  <div id="fc-paused" style="display:none;">
-    <div class="fc-paused">
-      <div class="fc-paused-icon">⏸️</div>
-      <div class="fc-paused-title">Session Paused</div>
-      <div class="fc-paused-sub" id="paused-info"></div>
-      <div style="display:flex;gap:8px;flex-direction:column;">
-        <button class="btn btn-primary btn-full" onclick="resumeSession()">▶ Resume Session</button>
-        <button class="btn btn-danger btn-full" onclick="endSession()">✕ End Session</button>
-      </div>
+      <button class="btn btn-secondary" id="fc-prev-btn" onclick="prevCard()" style="display:none;flex:1;justify-content:center;">← Prev</button>
+      <button class="btn btn-warning" onclick="pauseSession()" style="flex:1;justify-content:center;">⏸ Pause</button>
+      <button class="btn btn-danger" onclick="endSession()" style="flex:1;justify-content:center;">✕ End</button>
     </div>
   </div>
 
@@ -341,8 +322,7 @@
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Edit Vocabulary</div>
-    <input type="hidden" id="edit-id">
-    <input type="hidden" id="edit-date-added">
+    <input type="hidden" id="edit-idx">
     <div class="form-group"><label class="form-label">Word / Phrase *</label><input class="form-input" id="edit-word"></div>
     <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="edit-type"><option value="word">Word</option><option value="idiom">Idiom</option><option value="collocation">Collocation</option></select></div>
     <div class="form-group"><label class="form-label">Definition</label><textarea class="form-textarea" id="edit-def"></textarea></div>
@@ -385,6 +365,7 @@
 </div>
 
 <script>
+// ===== STATE =====
 let vocab = JSON.parse(localStorage.getItem('vm_vocab') || '[]');
 let savedSets = JSON.parse(localStorage.getItem('vm_sets') || '[]');
 let sheetsUrl = localStorage.getItem('vm_sheets_url') || '';
@@ -392,39 +373,65 @@ let sheetsOpenUrl = localStorage.getItem('vm_sheets_open_url') || '';
 let lastSyncTime = localStorage.getItem('vm_last_sync') || '';
 let currentFilter = 'all';
 let customFilter = 'all';
-let saveSetFilter = 'all';
-let fcQueue = [], fcIndex = 0, fcCorrect = 0, fcWrong = 0;
-let fcAnswered = [];
-let fcPaused = false;
-let pausedSession = null;
-let selectedWords = [], saveSetSelected = [];
-const SR = [1,3,7,14,30,90];
+let ssFilter = 'all'; // saveSet filter
+let fcQueue = [], fcIndex = 0, fcCorrect = 0, fcWrong = 0, fcAnswered = [];
+let selectedWords = [];
+let saveSetSelected = [];
+const SR = [1, 3, 7, 14, 30, 90];
 
+// ===== HELPERS =====
 function save() { localStorage.setItem('vm_vocab', JSON.stringify(vocab)); }
 function saveSets() { localStorage.setItem('vm_sets', JSON.stringify(savedSets)); }
-function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+
+function saveSession() {
+  if (fcQueue.length > 0) {
+    localStorage.setItem('vm_fc_session', JSON.stringify({
+      keys: fcQueue.map(v => v.word + '|||' + v.dateAdded),
+      fcIndex, fcCorrect, fcWrong, fcAnswered
+    }));
+  }
+}
+function loadSession() {
+  try {
+    const s = localStorage.getItem('vm_fc_session');
+    if (!s) return null;
+    const d = JSON.parse(s);
+    d.fcQueue = d.keys.map(key => {
+      const [word, date] = key.split('|||');
+      return vocab.find(v => v.word === word && v.dateAdded === date);
+    }).filter(Boolean);
+    if (d.fcQueue.length === 0) return null;
+    return d;
+  } catch(e) { return null; }
+}
+function clearSession() { localStorage.removeItem('vm_fc_session'); }
+
 function today() { return new Date().toISOString().split('T')[0]; }
 function nowStr() {
   const d = new Date();
   return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' +
     d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 }
-function nextReviewDate(v) {
-  const lvl = Math.min(v.correct||0, SR.length-1);
-  const d = new Date(); d.setDate(d.getDate()+SR[lvl]);
+function calcNextReview(v) {
+  const lvl = Math.min(v.correct || 0, SR.length - 1);
+  const d = new Date(); d.setDate(d.getDate() + SR[lvl]);
   return d.toISOString().split('T')[0];
 }
-function isDue(v) { return !v.nextReview || new Date(v.nextReview) <= new Date(); }
+function isDue(v) {
+  if (!v.nextReview) return true;
+  const next = new Date(v.nextReview); next.setHours(0,0,0,0);
+  const now = new Date(); now.setHours(0,0,0,0);
+  return next <= now;
+}
+function vkey(v) { return v.word + '|||' + v.dateAdded; }
 
 // ===== SHEETS =====
 function sheetsSend(params) {
   if (!sheetsUrl) return;
   const url = sheetsUrl + '?' + Object.entries(params)
-    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v==null?'':v))
+    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v == null ? '' : v))
     .join('&');
-  fetch(url).then(r=>r.json()).then(data=>{
-    if(data.status==='ok') updateSheetsBadge(true);
-  }).catch(()=>{});
+  fetch(url).then(r => r.json()).catch(() => null);
 }
 
 async function loadFromSheets() {
@@ -433,21 +440,20 @@ async function loadFromSheets() {
   try {
     const res = await fetch(sheetsUrl + '?action=getAll');
     const data = await res.json();
-    if (data.status === 'ok' && Array.isArray(data.vocab)) {
+    if (data.status === 'ok' && Array.isArray(data.vocab) && data.vocab.length > 0) {
       vocab = data.vocab.map(v => ({
-        id: v.id || genId(),
-        word: String(v.word||''),
-        type: String(v.type||'word'),
-        definition: String(v.definition||''),
-        example: String(v.example||''),
-        usage: String(v.usage||''),
-        notes: String(v.notes||''),
-        dateAdded: String(v.dateAdded||today()),
-        correct: parseInt(v.correct)||0,
-        wrong: parseInt(v.wrong)||0,
-        lastReview: String(v.lastReview||''),
-        nextReview: String(v.nextReview||'')
-      })).filter(v=>v.word);
+        word: String(v.word || '').trim(),
+        type: String(v.type || 'word').trim(),
+        definition: String(v.definition || '').trim(),
+        example: String(v.example || '').trim(),
+        usage: String(v.usage || '').trim(),
+        notes: String(v.notes || '').trim(),
+        dateAdded: String(v.dateAdded || today()).trim(),
+        correct: parseInt(v.correct) || 0,
+        wrong: parseInt(v.wrong) || 0,
+        lastReview: String(v.lastReview || '').trim(),
+        nextReview: String(v.nextReview || '').trim()
+      })).filter(v => v.word);
       save();
       lastSyncTime = nowStr();
       localStorage.setItem('vm_last_sync', lastSyncTime);
@@ -456,11 +462,9 @@ async function loadFromSheets() {
       updateSheetsBadge(true);
       showToast('✅ Synced! ' + vocab.length + ' words loaded.');
     } else {
-      showToast('⚠️ Could not load data from Sheets.');
+      showToast('⚠️ No data found in Sheets.');
     }
-  } catch(e) {
-    showToast('⚠️ Sync failed. Check your connection.');
-  }
+  } catch(e) { showToast('⚠️ Sync failed. Check connection.'); }
   document.getElementById('loading-overlay').classList.remove('show');
 }
 
@@ -468,7 +472,6 @@ function updateSyncTimeDisplay() {
   const el = document.getElementById('sync-time-display');
   if (el) el.textContent = lastSyncTime ? 'Last sync: ' + lastSyncTime : '';
 }
-
 function openSheetsModal() {
   if (sheetsUrl) {
     document.getElementById('sheets-setup-form').style.display = 'none';
@@ -484,371 +487,400 @@ function openSheetsModal() {
 function connectSheets() {
   const url = document.getElementById('sheets-url').value.trim();
   const openUrl = document.getElementById('sheets-open-url').value.trim();
-  if (!url) { document.getElementById('sheets-error').textContent='Please enter the Web App URL.'; document.getElementById('sheets-error').style.display='block'; return; }
+  if (!url) { document.getElementById('sheets-error').textContent = 'Please enter the Web App URL.'; document.getElementById('sheets-error').style.display = 'block'; return; }
   sheetsUrl = url; sheetsOpenUrl = openUrl;
   localStorage.setItem('vm_sheets_url', url);
   if (openUrl) localStorage.setItem('vm_sheets_open_url', openUrl);
   document.getElementById('sheets-setup-form').style.display = 'none';
   document.getElementById('sheets-connected-view').style.display = 'block';
   document.getElementById('open-sheets-btn').style.display = openUrl ? 'flex' : 'none';
-  updateSheetsBadge(true);
-  closeModal('modal-sheets');
-  showToast('✅ Connected!');
+  updateSheetsBadge(true); closeModal('modal-sheets'); showToast('✅ Connected!');
   loadFromSheets();
 }
 function disconnectSheets() {
-  sheetsUrl=''; sheetsOpenUrl='';
+  sheetsUrl = ''; sheetsOpenUrl = '';
   localStorage.removeItem('vm_sheets_url'); localStorage.removeItem('vm_sheets_open_url');
-  updateSheetsBadge(false); closeModal('modal-sheets');
-  showToast('Disconnected.');
+  updateSheetsBadge(false); closeModal('modal-sheets'); showToast('Disconnected.');
 }
-function openGoogleSheet() { if(sheetsOpenUrl) window.open(sheetsOpenUrl,'_blank'); }
+function openGoogleSheet() { if (sheetsOpenUrl) window.open(sheetsOpenUrl, '_blank'); }
 function updateSheetsBadge(ok) {
   const b = document.getElementById('sheets-status-badge');
   b.innerHTML = sheetsUrl
-    ? (ok?'<div class="dot dot-green"></div> Synced':'<div class="dot dot-yellow"></div> Connected')
+    ? (ok ? '<div class="dot dot-green"></div> Synced' : '<div class="dot dot-yellow"></div> Connected')
     : '<div class="dot dot-yellow"></div> Not connected';
 }
 
 // ===== NAV =====
 function showPage(p) {
-  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  const lbl={register:'Add',list:'List',flashcard:'Cards'};
-  document.querySelectorAll('.nav-tab').forEach(b=>{if(b.textContent.trim().includes(lbl[p]))b.classList.add('active');});
-  if(p==='list'){renderList();updateStats();}
-  if(p==='flashcard'){updateResumeBanner();}
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  const lbl = { register: 'Add', list: 'List', flashcard: 'Cards' };
+  document.querySelectorAll('.nav-tab').forEach(b => { if (b.textContent.trim().includes(lbl[p])) b.classList.add('active'); });
+  if (p === 'list') { renderList(); updateStats(); }
+  if (p === 'flashcard') { updateResumeBanner(); }
 }
 
 // ===== REGISTER =====
 function registerWord() {
-  const word=document.getElementById('reg-word').value.trim();
-  const def=document.getElementById('reg-def').value.trim();
-  if(!word||!def){showToast('Please fill in Word and Definition.');return;}
-  const entry={
-    id:genId(),word,type:document.getElementById('reg-type').value,
-    definition:def,example:document.getElementById('reg-example').value.trim(),
-    usage:document.getElementById('reg-usage').value.trim(),
-    notes:document.getElementById('reg-notes').value.trim(),
-    dateAdded:today(),correct:0,wrong:0,lastReview:'',nextReview:''
+  const word = document.getElementById('reg-word').value.trim();
+  const def = document.getElementById('reg-def').value.trim();
+  if (!word || !def) { showToast('Please fill in Word and Definition.'); return; }
+  const entry = {
+    word, type: document.getElementById('reg-type').value,
+    definition: def, example: document.getElementById('reg-example').value.trim(),
+    usage: document.getElementById('reg-usage').value.trim(),
+    notes: document.getElementById('reg-notes').value.trim(),
+    dateAdded: today(), correct: 0, wrong: 0, lastReview: '', nextReview: ''
   };
   vocab.push(entry); save();
-  ['reg-word','reg-def','reg-example','reg-usage','reg-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('reg-type').value='word';
-  showToast('✅ "'+word+'" saved!');
-  sheetsSend({action:'add',word:entry.word,type:entry.type,definition:entry.definition,
-    example:entry.example,usage:entry.usage,notes:entry.notes,dateAdded:entry.dateAdded,
-    correct:0,wrong:0,lastReview:'',nextReview:''});
+  ['reg-word','reg-def','reg-example','reg-usage','reg-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('reg-type').value = 'word';
+  showToast('✅ "' + word + '" saved!');
+  sheetsSend({ action: 'add', word: entry.word, type: entry.type, definition: entry.definition,
+    example: entry.example, usage: entry.usage, notes: entry.notes, dateAdded: entry.dateAdded,
+    correct: 0, wrong: 0, lastReview: '', nextReview: '' });
 }
 
 // ===== LIST =====
-function setFilter(f,el){
-  currentFilter=f;
-  document.querySelectorAll('#page-list .filter-btn').forEach(b=>b.classList.remove('active'));
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('#page-list .filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); renderList();
 }
-function renderList(){
-  const search=(document.getElementById('list-search').value||'').toLowerCase();
-  let items=vocab.filter(v=>{
-    if(currentFilter==='word'&&v.type!=='word')return false;
-    if(currentFilter==='idiom'&&v.type!=='idiom')return false;
-    if(currentFilter==='collocation'&&v.type!=='collocation')return false;
-    if(currentFilter==='weak'&&(v.wrong||0)<=1)return false;
-    if(search&&!v.word.toLowerCase().includes(search)&&!v.definition.toLowerCase().includes(search))return false;
+function renderList() {
+  const search = (document.getElementById('list-search').value || '').toLowerCase();
+  let items = vocab.filter(v => {
+    if (currentFilter === 'word' && v.type !== 'word') return false;
+    if (currentFilter === 'idiom' && v.type !== 'idiom') return false;
+    if (currentFilter === 'collocation' && v.type !== 'collocation') return false;
+    if (currentFilter === 'weak' && (v.wrong || 0) <= 1) return false;
+    if (search && !v.word.toLowerCase().includes(search) && !v.definition.toLowerCase().includes(search)) return false;
     return true;
-  }).sort((a,b)=>new Date(b.dateAdded)-new Date(a.dateAdded));
-  const c=document.getElementById('vocab-list-container');
-  if(!items.length){c.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No vocabulary found</div></div>';return;}
-  c.innerHTML=items.map(v=>{
-    const due=isDue(v)?'<span style="font-size:0.72rem;color:var(--warning);font-weight:700;">📅 Due</span>':'';
-    return`<div class="vocab-item">
-      <div class="vocab-header"><div class="vocab-word" onclick="toggleExpand('${v.id}')">${v.word}</div>
+  }).sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+  const c = document.getElementById('vocab-list-container');
+  if (!items.length) { c.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No vocabulary found</div></div>'; return; }
+  c.innerHTML = items.map(v => {
+    const idx = vocab.indexOf(v);
+    const due = isDue(v) ? '<span style="font-size:0.72rem;color:var(--warning);font-weight:700;">📅 Due</span>' : '';
+    return `<div class="vocab-item">
+      <div class="vocab-header"><div class="vocab-word" onclick="toggleExpand('exp-${idx}')">${v.word}</div>
       <div class="vocab-meta"><span class="badge badge-${v.type}">${v.type.charAt(0).toUpperCase()+v.type.slice(1)}</span>${due}</div></div>
       <div class="vocab-def">${v.definition.substring(0,100)}${v.definition.length>100?'…':''}</div>
       <div class="vocab-stats"><span class="stat-correct">✓ ${v.correct||0}</span><span class="stat-wrong">✗ ${v.wrong||0}</span><span>Added ${v.dateAdded}</span>${v.nextReview?'<span>Next: '+v.nextReview+'</span>':''}</div>
-      <div class="vocab-details" id="detail-${v.id}">
+      <div class="vocab-details" id="exp-${idx}">
         ${v.example?`<div class="detail-label">Example</div><div class="detail-val">${v.example}</div>`:''}
         ${v.usage?`<div class="detail-label">Usage</div><div class="detail-val">${v.usage}</div>`:''}
         ${v.notes?`<div class="detail-label">Notes</div><div class="detail-val">${v.notes}</div>`:''}
       </div>
-      <div class="vocab-actions"><button class="btn btn-sm btn-secondary" onclick="openEdit('${v.id}')">✏️ Edit</button><button class="btn btn-sm btn-danger" onclick="deleteWord('${v.id}')">🗑️ Delete</button></div>
+      <div class="vocab-actions"><button class="btn btn-sm btn-secondary" onclick="openEdit(${idx})">✏️ Edit</button><button class="btn btn-sm btn-danger" onclick="deleteWord(${idx})">🗑️ Delete</button></div>
     </div>`;
   }).join('');
 }
-function toggleExpand(id){document.getElementById('detail-'+id).classList.toggle('open');}
-function updateStats(){
-  document.getElementById('stat-total').textContent=vocab.length;
-  document.getElementById('stat-due').textContent=vocab.filter(isDue).length;
-  document.getElementById('stat-mastered').textContent=vocab.filter(v=>(v.correct||0)>=5).length;
+function toggleExpand(id) { document.getElementById(id).classList.toggle('open'); }
+function updateStats() {
+  document.getElementById('stat-total').textContent = vocab.length;
+  document.getElementById('stat-due').textContent = vocab.filter(isDue).length;
+  document.getElementById('stat-mastered').textContent = vocab.filter(v => (v.correct||0) >= 5).length;
 }
-function deleteWord(id){
-  if(!confirm('Delete this word?'))return;
-  const v=vocab.find(x=>x.id===id);
-  vocab=vocab.filter(x=>x.id!==id); save(); renderList(); updateStats();
-  if(v) sheetsSend({action:'delete',word:v.word,dateAdded:v.dateAdded});
+function deleteWord(idx) {
+  if (!confirm('Delete this word?')) return;
+  const v = vocab[idx];
+  vocab.splice(idx, 1); save(); renderList(); updateStats();
+  sheetsSend({ action: 'delete', word: v.word, dateAdded: v.dateAdded });
 }
-function openEdit(id){
-  const v=vocab.find(x=>x.id===id); if(!v)return;
-  document.getElementById('edit-id').value=id;
-  document.getElementById('edit-date-added').value=v.dateAdded;
-  document.getElementById('edit-word').value=v.word;
-  document.getElementById('edit-type').value=v.type;
-  document.getElementById('edit-def').value=v.definition;
-  document.getElementById('edit-example').value=v.example||'';
-  document.getElementById('edit-usage').value=v.usage||'';
-  document.getElementById('edit-notes').value=v.notes||'';
+function openEdit(idx) {
+  const v = vocab[idx]; if (!v) return;
+  document.getElementById('edit-idx').value = idx;
+  document.getElementById('edit-word').value = v.word;
+  document.getElementById('edit-type').value = v.type;
+  document.getElementById('edit-def').value = v.definition;
+  document.getElementById('edit-example').value = v.example || '';
+  document.getElementById('edit-usage').value = v.usage || '';
+  document.getElementById('edit-notes').value = v.notes || '';
   openModal('modal-edit');
 }
-function saveEdit(){
-  const id=document.getElementById('edit-id').value;
-  const v=vocab.find(x=>x.id===id); if(!v)return;
-  const oldWord=v.word; const oldDate=v.dateAdded;
-  v.word=document.getElementById('edit-word').value.trim();
-  v.type=document.getElementById('edit-type').value;
-  v.definition=document.getElementById('edit-def').value.trim();
-  v.example=document.getElementById('edit-example').value.trim();
-  v.usage=document.getElementById('edit-usage').value.trim();
-  v.notes=document.getElementById('edit-notes').value.trim();
+function saveEdit() {
+  const idx = parseInt(document.getElementById('edit-idx').value);
+  const v = vocab[idx]; if (!v) return;
+  const originalWord = v.word;
+  const originalDate = v.dateAdded;
+  v.word = document.getElementById('edit-word').value.trim();
+  v.type = document.getElementById('edit-type').value;
+  v.definition = document.getElementById('edit-def').value.trim();
+  v.example = document.getElementById('edit-example').value.trim();
+  v.usage = document.getElementById('edit-usage').value.trim();
+  v.notes = document.getElementById('edit-notes').value.trim();
   save(); closeModal('modal-edit'); renderList();
-  // Send update with original word+date for matching, plus all new values
-  sheetsSend({action:'update',word:v.word,type:v.type,definition:v.definition,
-    example:v.example,usage:v.usage,notes:v.notes,dateAdded:v.dateAdded,
-    correct:v.correct||0,wrong:v.wrong||0,lastReview:v.lastReview||'',nextReview:v.nextReview||'',
-    originalWord:oldWord,originalDate:oldDate});
+  sheetsSend({
+    action: 'update', originalWord, originalDate,
+    word: v.word, type: v.type, definition: v.definition,
+    example: v.example, usage: v.usage, notes: v.notes,
+    dateAdded: v.dateAdded, correct: v.correct || 0,
+    wrong: v.wrong || 0, lastReview: v.lastReview || '', nextReview: v.nextReview || ''
+  });
   showToast('✅ Updated and synced!');
 }
 
 // ===== FLASHCARD =====
-function updateResumeBanner(){
-  const banner=document.getElementById('fc-resume-banner');
-  if(pausedSession){
-    banner.style.display='flex';
-    document.getElementById('resume-info').textContent=
-      (fcQueue.length-fcIndex)+' cards remaining · '+fcCorrect+' correct, '+fcWrong+' incorrect';
+function updateResumeBanner() {
+  const session = loadSession();
+  const banner = document.getElementById('fc-resume-banner');
+  if (session && session.fcQueue && session.fcQueue.length > 0) {
+    banner.style.display = 'flex';
+    const remaining = session.fcQueue.length - session.fcIndex;
+    document.getElementById('resume-info').textContent =
+      remaining + ' cards remaining · ' + session.fcCorrect + ' correct, ' + session.fcWrong + ' incorrect';
   } else {
-    banner.style.display='none';
+    banner.style.display = 'none';
   }
 }
-function setCustomFilter(f,el){
-  customFilter=f;
-  document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
+function resumeSession() {
+  const session = loadSession();
+  if (!session) return;
+  fcQueue = session.fcQueue;
+  fcIndex = session.fcIndex;
+  fcCorrect = session.fcCorrect;
+  fcWrong = session.fcWrong;
+  fcAnswered = session.fcAnswered || [];
+  showSessionUI(); showCard();
+}
+function setCustomFilter(f, el) {
+  customFilter = f;
+  document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); renderCustomSelectList();
 }
-function renderCustomSelectList(){
-  const search=(document.getElementById('custom-search').value||'').toLowerCase();
-  const items=vocab.filter(v=>{
-    if(customFilter==='word'&&v.type!=='word')return false;
-    if(customFilter==='idiom'&&v.type!=='idiom')return false;
-    if(customFilter==='collocation'&&v.type!=='collocation')return false;
-    if(customFilter==='due'&&!isDue(v))return false;
-    if(search&&!v.word.toLowerCase().includes(search)&&!v.definition.toLowerCase().includes(search))return false;
+function renderCustomSelectList() {
+  const search = (document.getElementById('custom-search').value || '').toLowerCase();
+  const items = vocab.filter(v => {
+    if (customFilter === 'word' && v.type !== 'word') return false;
+    if (customFilter === 'idiom' && v.type !== 'idiom') return false;
+    if (customFilter === 'collocation' && v.type !== 'collocation') return false;
+    if (customFilter === 'due' && !isDue(v)) return false;
+    if (search && !v.word.toLowerCase().includes(search) && !v.definition.toLowerCase().includes(search)) return false;
     return true;
   });
-  const c=document.getElementById('custom-select-list');
-  c.innerHTML=items.length
-    ?items.map(v=>`<div class="select-item" onclick="toggleSel('${v.id}','chk-${v.id}',0)">
-        <div class="select-checkbox" id="chk-${v.id}"></div>
-        <div><div style="font-weight:700;color:var(--blue-700)">${v.word}</div><div style="font-size:0.78rem;color:var(--gray-400)">${v.definition.substring(0,50)}…</div></div>
-      </div>`).join('')
-    :'<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
-  selectedWords.forEach(id=>{const chk=document.getElementById('chk-'+id);if(chk){chk.classList.add('checked');chk.textContent='✓';}});
+  const c = document.getElementById('custom-select-list');
+  c.innerHTML = items.length
+    ? items.map(v => {
+        const k = vkey(v);
+        const cid = 'chk-' + k.replace(/[^a-zA-Z0-9]/g,'_');
+        return `<div class="select-item" onclick="toggleSel('${k}','${cid}',0)">
+          <div class="select-checkbox" id="${cid}"></div>
+          <div><div style="font-weight:700;color:var(--blue-700)">${v.word}</div><div style="font-size:0.78rem;color:var(--gray-400)">${v.definition.substring(0,50)}…</div></div>
+        </div>`;
+      }).join('')
+    : '<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
+  selectedWords.forEach(k => {
+    const cid = 'chk-' + k.replace(/[^a-zA-Z0-9]/g,'_');
+    const chk = document.getElementById(cid);
+    if (chk) { chk.classList.add('checked'); chk.textContent = '✓'; }
+  });
 }
-function setSaveSetFilter(f,el){
-  saveSetFilter=f;
-  document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
+function setSaveSetFilter(f, el) {
+  ssFilter = f;
+  document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); renderSaveSetList();
 }
-function renderSaveSetList(){
-  const search=(document.getElementById('save-set-search').value||'').toLowerCase();
-  const items=vocab.filter(v=>{
-    if(saveSetFilter==='word'&&v.type!=='word')return false;
-    if(saveSetFilter==='idiom'&&v.type!=='idiom')return false;
-    if(saveSetFilter==='collocation'&&v.type!=='collocation')return false;
-    if(saveSetFilter==='due'&&!isDue(v))return false;
-    if(search&&!v.word.toLowerCase().includes(search))return false;
+function renderSaveSetList() {
+  const search = (document.getElementById('save-set-search').value || '').toLowerCase();
+  const items = vocab.filter(v => {
+    if (ssFilter === 'word' && v.type !== 'word') return false;
+    if (ssFilter === 'idiom' && v.type !== 'idiom') return false;
+    if (ssFilter === 'collocation' && v.type !== 'collocation') return false;
+    if (ssFilter === 'due' && !isDue(v)) return false;
+    if (search && !v.word.toLowerCase().includes(search)) return false;
     return true;
   });
-  const c=document.getElementById('save-set-select-list');
-  c.innerHTML=items.length
-    ?items.map(v=>`<div class="select-item" onclick="toggleSel('${v.id}','ss-${v.id}',1)">
-        <div class="select-checkbox" id="ss-${v.id}"></div>
-        <div><div style="font-weight:700;color:var(--blue-700)">${v.word}</div></div>
-      </div>`).join('')
-    :'<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
-  saveSetSelected.forEach(id=>{const chk=document.getElementById('ss-'+id);if(chk){chk.classList.add('checked');chk.textContent='✓';}});
+  const c = document.getElementById('save-set-select-list');
+  c.innerHTML = items.length
+    ? items.map(v => {
+        const k = vkey(v);
+        const cid = 'ss-' + k.replace(/[^a-zA-Z0-9]/g,'_');
+        return `<div class="select-item" onclick="toggleSel('${k}','${cid}',1)">
+          <div class="select-checkbox" id="${cid}"></div>
+          <div><div style="font-weight:700;color:var(--blue-700)">${v.word}</div></div>
+        </div>`;
+      }).join('')
+    : '<div class="empty" style="padding:20px"><div class="empty-text">No words found</div></div>';
+  saveSetSelected.forEach(k => {
+    const cid = 'ss-' + k.replace(/[^a-zA-Z0-9]/g,'_');
+    const chk = document.getElementById(cid);
+    if (chk) { chk.classList.add('checked'); chk.textContent = '✓'; }
+  });
 }
-function startMode(mode){
-  const q=mode==='today'?vocab.filter(isDue):vocab;
-  if(!q.length){showToast('🎉 No words due today!');return;}
+function toggleSel(key, chkId, mode) {
+  const arr = mode === 0 ? selectedWords : saveSetSelected;
+  const chk = document.getElementById(chkId);
+  if (arr.includes(key)) { arr.splice(arr.indexOf(key), 1); chk.classList.remove('checked'); chk.textContent = ''; }
+  else { arr.push(key); chk.classList.add('checked'); chk.textContent = '✓'; }
+}
+function startMode(mode) {
+  const q = mode === 'today' ? vocab.filter(isDue) : vocab;
+  if (!q.length) { showToast('🎉 No words due today!'); return; }
   startSession(q);
 }
-function openCustomSelect(){
-  if(!vocab.length){showToast('No vocabulary saved yet.');return;}
-  selectedWords=[]; customFilter='all';
-  document.getElementById('custom-search').value='';
-  document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
+function openCustomSelect() {
+  if (!vocab.length) { showToast('No vocabulary saved yet.'); return; }
+  selectedWords = []; customFilter = 'all';
+  document.getElementById('custom-search').value = '';
+  document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('#custom-filter-bar .filter-btn').classList.add('active');
   renderCustomSelectList(); openModal('modal-custom');
 }
-function toggleSel(id,chkId,mode){
-  const arr=mode===0?selectedWords:saveSetSelected;
-  const chk=document.getElementById(chkId);
-  if(arr.includes(id)){arr.splice(arr.indexOf(id),1);chk.classList.remove('checked');chk.textContent='';}
-  else{arr.push(id);chk.classList.add('checked');chk.textContent='✓';}
+function startCustomSession() {
+  if (!selectedWords.length) { showToast('Select at least one word.'); return; }
+  closeModal('modal-custom');
+  startSession(vocab.filter(v => selectedWords.includes(vkey(v))));
 }
-function startCustomSession(){
-  if(!selectedWords.length){showToast('Select at least one word.');return;}
-  closeModal('modal-custom'); startSession(vocab.filter(v=>selectedWords.includes(v.id)));
+function toggleSavedSets() {
+  const s = document.getElementById('saved-sets-section');
+  s.style.display = s.style.display === 'none' ? 'block' : 'none'; renderSavedSets();
 }
-function toggleSavedSets(){
-  const s=document.getElementById('saved-sets-section');
-  s.style.display=s.style.display==='none'?'block':'none'; renderSavedSets();
+function renderSavedSets() {
+  const c = document.getElementById('sets-list-container');
+  if (!savedSets.length) { c.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-text">No saved sets yet</div></div>'; return; }
+  c.innerHTML = savedSets.map((s, i) => `<div class="set-item"><div><div class="set-name">${s.name}</div><div class="set-count">${s.ids.length} words · ${s.created}</div></div><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-primary" onclick="startSetSession(${i})">▶ Start</button><button class="btn btn-sm btn-danger" onclick="deleteSet(${i})">🗑️</button></div></div>`).join('');
 }
-function renderSavedSets(){
-  const c=document.getElementById('sets-list-container');
-  if(!savedSets.length){c.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text">No saved sets yet</div></div>';return;}
-  c.innerHTML=savedSets.map((s,i)=>`<div class="set-item"><div><div class="set-name">${s.name}</div><div class="set-count">${s.ids.length} words · ${s.created}</div></div><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-primary" onclick="startSetSession(${i})">▶ Start</button><button class="btn btn-sm btn-danger" onclick="deleteSet(${i})">🗑️</button></div></div>`).join('');
+function startSetSession(i) {
+  const q = vocab.filter(v => savedSets[i].ids.includes(vkey(v)));
+  document.getElementById('saved-sets-section').style.display = 'none'; startSession(q);
 }
-function startSetSession(i){
-  const q=vocab.filter(v=>savedSets[i].ids.includes(v.id));
-  document.getElementById('saved-sets-section').style.display='none'; startSession(q);
-}
-function deleteSet(i){if(!confirm('Delete this set?'))return;savedSets.splice(i,1);saveSets();renderSavedSets();}
-function openSaveSetModal(){
-  saveSetSelected=[]; saveSetFilter='all';
-  document.getElementById('set-name-input').value='';
-  document.getElementById('save-set-search').value='';
-  document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));
+function deleteSet(i) { if (!confirm('Delete this set?')) return; savedSets.splice(i,1); saveSets(); renderSavedSets(); }
+function openSaveSetModal() {
+  saveSetSelected = []; ssFilter = 'all';
+  document.getElementById('set-name-input').value = '';
+  document.getElementById('save-set-search').value = '';
+  document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('#save-set-filter-bar .filter-btn').classList.add('active');
   renderSaveSetList(); openModal('modal-save-set');
 }
-function saveSet(){
-  const name=document.getElementById('set-name-input').value.trim();
-  if(!name){showToast('Enter a set name.');return;}
-  if(!saveSetSelected.length){showToast('Select at least one word.');return;}
-  savedSets.push({name,ids:[...saveSetSelected],created:today()});
+function saveSet() {
+  const name = document.getElementById('set-name-input').value.trim();
+  if (!name) { showToast('Enter a set name.'); return; }
+  if (!saveSetSelected.length) { showToast('Select at least one word.'); return; }
+  savedSets.push({ name, ids: [...saveSetSelected], created: today() });
   saveSets(); closeModal('modal-save-set'); renderSavedSets(); showToast('📚 Set saved!');
 }
-
-function startSession(queue){
-  pausedSession=null;
-  fcQueue=[...queue].sort(()=>Math.random()-0.5);
-  fcIndex=0; fcCorrect=0; fcWrong=0; fcAnswered=[];
-  showSessionScreen(); showCard();
+function startSession(queue) {
+  clearSession();
+  fcQueue = [...queue].sort(() => Math.random() - 0.5);
+  fcIndex = 0; fcCorrect = 0; fcWrong = 0; fcAnswered = [];
+  showSessionUI(); showCard();
 }
-function showSessionScreen(){
-  document.getElementById('fc-home').style.display='none';
-  document.getElementById('fc-paused').style.display='none';
-  document.getElementById('fc-complete').style.display='none';
-  document.getElementById('fc-session').style.display='block';
+function showSessionUI() {
+  document.getElementById('fc-home').style.display = 'none';
+  document.getElementById('fc-complete').style.display = 'none';
+  document.getElementById('fc-session').style.display = 'block';
 }
-function showCard(){
-  const v=fcQueue[fcIndex];
-  document.getElementById('fc-card-label').textContent=v.type.toUpperCase();
-  document.getElementById('fc-card-word').textContent=v.word;
-  document.getElementById('fc-card-def').textContent=v.definition;
-  document.getElementById('fc-card-example').textContent=v.example?'"'+v.example+'"':'';
-  document.getElementById('fc-hint').style.display='block';
-  document.getElementById('fc-hint').textContent='Tap to reveal definition';
+function showCard() {
+  const v = fcQueue[fcIndex];
+  document.getElementById('fc-card-label').textContent = v.type.toUpperCase();
+  document.getElementById('fc-card-word').textContent = v.word;
+  document.getElementById('fc-card-def').textContent = v.definition;
+  document.getElementById('fc-card-example').textContent = v.example ? '"' + v.example + '"' : '';
+  document.getElementById('fc-hint').style.display = 'block';
+  document.getElementById('fc-hint').textContent = 'Tap to reveal definition';
   document.getElementById('fc-answer').classList.remove('show');
-  document.getElementById('fc-action-btns').style.display='none';
-  const prevBtn=document.getElementById('fc-prev-btn');
-  prevBtn.style.display=fcIndex>0?'flex':'none';
-  const pct=Math.round((fcIndex/fcQueue.length)*100);
-  document.getElementById('fc-prog-fill').style.width=pct+'%';
-  document.getElementById('fc-prog-text').textContent=(fcIndex+1)+' / '+fcQueue.length;
+  document.getElementById('fc-action-btns').style.display = 'none';
+  document.getElementById('fc-prev-btn').style.display = fcIndex > 0 ? 'flex' : 'none';
+  const pct = Math.round((fcIndex / fcQueue.length) * 100);
+  document.getElementById('fc-prog-fill').style.width = pct + '%';
+  document.getElementById('fc-prog-text').textContent = (fcIndex + 1) + ' / ' + fcQueue.length;
+  saveSession();
 }
-function revealCard(){
+function revealCard() {
   document.getElementById('fc-answer').classList.add('show');
-  document.getElementById('fc-hint').style.display='none';
-  document.getElementById('fc-action-btns').style.display='block';
+  document.getElementById('fc-hint').style.display = 'none';
+  document.getElementById('fc-action-btns').style.display = 'block';
 }
-function prevCard(){
-  if(fcIndex<=0)return;
-  const last=fcAnswered.pop();
-  if(last!==undefined){
-    const entry=vocab.find(x=>x.id===fcQueue[fcIndex-1].id);
-    if(entry){
-      if(last===true){entry.correct=Math.max(0,(entry.correct||1)-1);fcCorrect--;}
-      else{entry.wrong=Math.max(0,(entry.wrong||1)-1);fcWrong--;}
+function prevCard() {
+  if (fcIndex <= 0) return;
+  const last = fcAnswered.pop();
+  if (last !== undefined) {
+    const entry = vocab.find(x => vkey(x) === vkey(fcQueue[fcIndex-1]));
+    if (entry) {
+      if (last === true) { entry.correct = Math.max(0, (entry.correct||1) - 1); fcCorrect--; }
+      else { entry.wrong = Math.max(0, (entry.wrong||1) - 1); fcWrong--; }
       save();
     }
   }
   fcIndex--; showCard();
 }
-function recordAnswer(correct){
-  const entry=vocab.find(x=>x.id===fcQueue[fcIndex].id);
-  if(entry){
-    if(correct){entry.correct=(entry.correct||0)+1;fcCorrect++;}
-    else{entry.wrong=(entry.wrong||0)+1;fcWrong++;}
-    entry.lastReview=today(); entry.nextReview=nextReviewDate(entry); save();
-    fcAnswered.push(correct);
-    sheetsSend({action:'update',word:entry.word,type:entry.type,definition:entry.definition,
-      example:entry.example||'',usage:entry.usage||'',notes:entry.notes||'',
-      dateAdded:entry.dateAdded,correct:entry.correct,wrong:entry.wrong,
-      lastReview:entry.lastReview,nextReview:entry.nextReview,
-      originalWord:entry.word,originalDate:entry.dateAdded});
+function recordAnswer(correct) {
+  const entry = vocab.find(x => vkey(x) === vkey(fcQueue[fcIndex]));
+  if (entry) {
+    if (correct) { entry.correct = (entry.correct || 0) + 1; fcCorrect++; }
+    else { entry.wrong = (entry.wrong || 0) + 1; fcWrong++; }
+    entry.lastReview = today();
+    entry.nextReview = calcNextReview(entry);
+    save(); fcAnswered.push(correct);
+    sheetsSend({
+      action: 'update',
+      originalWord: entry.word, originalDate: entry.dateAdded,
+      word: entry.word, type: entry.type, definition: entry.definition,
+      example: entry.example || '', usage: entry.usage || '', notes: entry.notes || '',
+      dateAdded: entry.dateAdded, correct: entry.correct, wrong: entry.wrong,
+      lastReview: entry.lastReview, nextReview: entry.nextReview
+    });
   }
   fcIndex++;
-  if(fcIndex>=fcQueue.length) showComplete(); else showCard();
+  if (fcIndex >= fcQueue.length) showComplete(); else showCard();
 }
-function pauseSession(){
-  pausedSession={fcQueue,fcIndex,fcCorrect,fcWrong,fcAnswered:[...fcAnswered]};
-  document.getElementById('fc-session').style.display='none';
-  document.getElementById('fc-paused').style.display='block';
-  document.getElementById('paused-info').textContent=
-    (fcQueue.length-fcIndex)+' cards remaining · '+fcCorrect+' correct, '+fcWrong+' incorrect';
-}
-function resumeSession(){
-  if(!pausedSession)return;
-  fcQueue=pausedSession.fcQueue;
-  fcIndex=pausedSession.fcIndex;
-  fcCorrect=pausedSession.fcCorrect;
-  fcWrong=pausedSession.fcWrong;
-  fcAnswered=pausedSession.fcAnswered;
-  pausedSession=null;
-  showSessionScreen(); showCard();
+function pauseSession() {
+  saveSession();
+  document.getElementById('fc-session').style.display = 'none';
+  document.getElementById('fc-home').style.display = 'block';
+  document.getElementById('saved-sets-section').style.display = 'none';
   updateResumeBanner();
+  showToast('⏸️ Session paused. You can resume anytime.');
 }
-function endSession(){
-  pausedSession=null;
+function endSession() {
+  clearSession();
   backToHome();
 }
-function showComplete(){
-  pausedSession=null;
-  document.getElementById('fc-session').style.display='none';
-  document.getElementById('fc-complete').style.display='block';
-  document.getElementById('score-correct').textContent=fcCorrect;
-  document.getElementById('score-wrong').textContent=fcWrong;
-  document.getElementById('score-total').textContent=fcQueue.length;
-  const pct=Math.round((fcCorrect/fcQueue.length)*100);
-  document.getElementById('fc-complete-sub').textContent=
-    pct>=80?'🌟 Excellent! '+pct+'% accuracy!':pct>=60?'👍 Good work! '+pct+'% accuracy.':'💪 Keep practicing! '+pct+'% accuracy.';
+function showComplete() {
+  clearSession();
+  document.getElementById('fc-session').style.display = 'none';
+  document.getElementById('fc-complete').style.display = 'block';
+  document.getElementById('score-correct').textContent = fcCorrect;
+  document.getElementById('score-wrong').textContent = fcWrong;
+  document.getElementById('score-total').textContent = fcQueue.length;
+  const pct = Math.round((fcCorrect / fcQueue.length) * 100);
+  document.getElementById('fc-complete-sub').textContent =
+    pct >= 80 ? '🌟 Excellent! ' + pct + '% accuracy!' :
+    pct >= 60 ? '👍 Good work! ' + pct + '% accuracy.' :
+    '💪 Keep practicing! ' + pct + '% accuracy.';
 }
-function backToHome(){
-  document.getElementById('fc-session').style.display='none';
-  document.getElementById('fc-paused').style.display='none';
-  document.getElementById('fc-complete').style.display='none';
-  document.getElementById('fc-home').style.display='block';
-  document.getElementById('saved-sets-section').style.display='none';
+function backToHome() {
+  document.getElementById('fc-session').style.display = 'none';
+  document.getElementById('fc-complete').style.display = 'none';
+  document.getElementById('fc-home').style.display = 'block';
+  document.getElementById('saved-sets-section').style.display = 'none';
   updateResumeBanner();
 }
 
 // ===== MODAL =====
-function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
-document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);});});
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+});
 
 // ===== TOAST =====
-function showToast(msg){
-  let t=document.getElementById('toast');
-  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:40px;font-size:0.88rem;font-weight:700;z-index:999;font-family:Nunito,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.2);transition:opacity 0.3s;white-space:nowrap;max-width:90vw;text-align:center;';document.body.appendChild(t);}
-  t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2800);
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div'); t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 20px;border-radius:40px;font-size:0.88rem;font-weight:700;z-index:999;font-family:Nunito,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.2);transition:opacity 0.3s;white-space:nowrap;max-width:90vw;text-align:center;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._t); t._t = setTimeout(() => t.style.opacity = '0', 2800);
 }
 
 // ===== INIT =====
-if(sheetsUrl) updateSheetsBadge(true);
+if (sheetsUrl) updateSheetsBadge(true);
 updateSyncTimeDisplay();
 renderList(); updateStats();
 </script>
