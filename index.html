@@ -9,9 +9,8 @@
 <style>
   :root {
     --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;--blue-300:#93c5fd;
-    --blue-400:#60a5fa;--blue-500:#3b82f6;--blue-600:#2563eb;--blue-700:#1d4ed8;
-    --blue-800:#1e40af;--navy:#0f172a;--gray-200:#e2e8f0;
-    --gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;
+    --blue-400:#60a5fa;--blue-600:#2563eb;--blue-700:#1d4ed8;--blue-800:#1e40af;
+    --navy:#0f172a;--gray-200:#e2e8f0;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;
     --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
     --radius:16px;--radius-sm:10px;
     --shadow:0 4px 24px rgba(37,99,235,0.10);--shadow-lg:0 8px 40px rgba(37,99,235,0.18);
@@ -105,7 +104,7 @@
   .sheets-banner-icon{font-size:1.8rem;flex-shrink:0;}
   .sheets-banner-text h4{font-size:0.92rem;font-weight:800;margin-bottom:2px;}
   .sheets-banner-text p{font-size:0.78rem;opacity:0.8;}
-  .sheets-banner-text .sync-time{font-size:0.72rem;opacity:0.7;margin-top:3px;}
+  .sync-time{font-size:0.72rem;opacity:0.7;margin-top:3px;}
   .sheets-status{display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:700;margin-top:6px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.15);}
   .sheets-actions{display:flex;gap:6px;margin-left:auto;flex-shrink:0;flex-direction:column;}
   .dot{width:7px;height:7px;border-radius:50%;}
@@ -222,7 +221,7 @@
       <button class="btn btn-sm" style="background:rgba(255,255,255,0.25);color:white;border:none;flex-shrink:0;" onclick="resumeSession()">▶ Resume</button>
     </div>
     <div class="fc-mode-select">
-      <div class="fc-mode-card" onclick="startMode('today')"><div class="fc-mode-icon">🔄</div><div><div class="fc-mode-title">Today's Review</div><div class="fc-mode-desc">Spaced repetition study</div></div></div>
+      <div class="fc-mode-card" onclick="startMode('today')"><div class="fc-mode-icon">🔄</div><div><div class="fc-mode-title">Today's Review</div><div class="fc-mode-desc">Based on registration date</div></div></div>
       <div class="fc-mode-card" onclick="openCustomSelect()"><div class="fc-mode-icon">✏️</div><div><div class="fc-mode-title">Custom Selection</div><div class="fc-mode-desc">Pick words from your list</div></div></div>
       <div class="fc-mode-card" onclick="toggleSavedSets()"><div class="fc-mode-icon">📚</div><div><div class="fc-mode-title">Saved Sets</div><div class="fc-mode-desc">Study a saved flashcard set</div></div></div>
     </div>
@@ -302,11 +301,11 @@
     <div class="form-group"><label class="form-label">Set Name</label><input class="form-input" id="set-name-input" placeholder="e.g. IELTS Week 1"></div>
     <input class="form-input" id="save-set-search" placeholder="🔍 Search words..." style="margin-bottom:10px;" oninput="renderSaveSetList()">
     <div class="filter-bar" id="save-set-filter-bar">
-      <button class="filter-btn active" onclick="setSaveSetFilter('all',this)">All</button>
-      <button class="filter-btn" onclick="setSaveSetFilter('word',this)">Words</button>
-      <button class="filter-btn" onclick="setSaveSetFilter('idiom',this)">Idioms</button>
-      <button class="filter-btn" onclick="setSaveSetFilter('collocation',this)">Collocations</button>
-      <button class="filter-btn" onclick="setSaveSetFilter('due',this)">📅 Due</button>
+      <button class="filter-btn active" onclick="setSsFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setSsFilter('word',this)">Words</button>
+      <button class="filter-btn" onclick="setSsFilter('idiom',this)">Idioms</button>
+      <button class="filter-btn" onclick="setSsFilter('collocation',this)">Collocations</button>
+      <button class="filter-btn" onclick="setSsFilter('due',this)">📅 Due</button>
     </div>
     <div id="save-set-select-list" style="max-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
     <div style="display:flex;gap:8px;">
@@ -373,16 +372,17 @@ let sheetsOpenUrl = localStorage.getItem('vm_sheets_open_url') || '';
 let lastSyncTime = localStorage.getItem('vm_last_sync') || '';
 let currentFilter = 'all';
 let customFilter = 'all';
-let ssFilter = 'all'; // saveSet filter
+let ssFilter = 'all';
 let fcQueue = [], fcIndex = 0, fcCorrect = 0, fcWrong = 0, fcAnswered = [];
 let selectedWords = [];
 let saveSetSelected = [];
-const SR = [1, 3, 7, 14, 30, 90];
+
+// Spaced repetition intervals in days from registration date
+const SR_DAYS = [1, 3, 7, 14, 30, 90];
 
 // ===== HELPERS =====
 function save() { localStorage.setItem('vm_vocab', JSON.stringify(vocab)); }
 function saveSets() { localStorage.setItem('vm_sets', JSON.stringify(savedSets)); }
-
 function saveSession() {
   if (fcQueue.length > 0) {
     localStorage.setItem('vm_fc_session', JSON.stringify({
@@ -400,30 +400,30 @@ function loadSession() {
       const [word, date] = key.split('|||');
       return vocab.find(v => v.word === word && v.dateAdded === date);
     }).filter(Boolean);
-    if (d.fcQueue.length === 0) return null;
+    if (!d.fcQueue.length) return null;
     return d;
   } catch(e) { return null; }
 }
 function clearSession() { localStorage.removeItem('vm_fc_session'); }
-
 function today() { return new Date().toISOString().split('T')[0]; }
 function nowStr() {
   const d = new Date();
   return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' +
     d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 }
-function calcNextReview(v) {
-  const lvl = Math.min(v.correct || 0, SR.length - 1);
-  const d = new Date(); d.setDate(d.getDate() + SR[lvl]);
-  return d.toISOString().split('T')[0];
+
+// ===== SPACED REPETITION (date-based) =====
+// Returns true if the word should appear in Today's Review
+// Based on days since registration: 1, 3, 7, 14, 30, 90
+function isDueToday(v) {
+  if (!v.dateAdded) return false;
+  const registered = new Date(v.dateAdded);
+  registered.setHours(0,0,0,0);
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  const daysSince = Math.round((now - registered) / 86400000);
+  return SR_DAYS.includes(daysSince);
 }
-function isDue(v) {
-  if (!v.nextReview) return true;
-  const next = new Date(v.nextReview); next.setHours(0,0,0,0);
-  const now = new Date(); now.setHours(0,0,0,0);
-  return next <= now;
-}
-function vkey(v) { return v.word + '|||' + v.dateAdded; }
 
 // ===== SHEETS =====
 function sheetsSend(params) {
@@ -450,9 +450,7 @@ async function loadFromSheets() {
         notes: String(v.notes || '').trim(),
         dateAdded: String(v.dateAdded || today()).trim(),
         correct: parseInt(v.correct) || 0,
-        wrong: parseInt(v.wrong) || 0,
-        lastReview: String(v.lastReview || '').trim(),
-        nextReview: String(v.nextReview || '').trim()
+        wrong: parseInt(v.wrong) || 0
       })).filter(v => v.word);
       save();
       lastSyncTime = nowStr();
@@ -531,7 +529,7 @@ function registerWord() {
     definition: def, example: document.getElementById('reg-example').value.trim(),
     usage: document.getElementById('reg-usage').value.trim(),
     notes: document.getElementById('reg-notes').value.trim(),
-    dateAdded: today(), correct: 0, wrong: 0, lastReview: '', nextReview: ''
+    dateAdded: today(), correct: 0, wrong: 0
   };
   vocab.push(entry); save();
   ['reg-word','reg-def','reg-example','reg-usage','reg-notes'].forEach(id => document.getElementById(id).value = '');
@@ -539,7 +537,7 @@ function registerWord() {
   showToast('✅ "' + word + '" saved!');
   sheetsSend({ action: 'add', word: entry.word, type: entry.type, definition: entry.definition,
     example: entry.example, usage: entry.usage, notes: entry.notes, dateAdded: entry.dateAdded,
-    correct: 0, wrong: 0, lastReview: '', nextReview: '' });
+    correct: 0, wrong: 0 });
 }
 
 // ===== LIST =====
@@ -562,12 +560,12 @@ function renderList() {
   if (!items.length) { c.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No vocabulary found</div></div>'; return; }
   c.innerHTML = items.map(v => {
     const idx = vocab.indexOf(v);
-    const due = isDue(v) ? '<span style="font-size:0.72rem;color:var(--warning);font-weight:700;">📅 Due</span>' : '';
+    const due = isDueToday(v) ? '<span style="font-size:0.72rem;color:var(--warning);font-weight:700;">📅 Due Today</span>' : '';
     return `<div class="vocab-item">
       <div class="vocab-header"><div class="vocab-word" onclick="toggleExpand('exp-${idx}')">${v.word}</div>
       <div class="vocab-meta"><span class="badge badge-${v.type}">${v.type.charAt(0).toUpperCase()+v.type.slice(1)}</span>${due}</div></div>
       <div class="vocab-def">${v.definition.substring(0,100)}${v.definition.length>100?'…':''}</div>
-      <div class="vocab-stats"><span class="stat-correct">✓ ${v.correct||0}</span><span class="stat-wrong">✗ ${v.wrong||0}</span><span>Added ${v.dateAdded}</span>${v.nextReview?'<span>Next: '+v.nextReview+'</span>':''}</div>
+      <div class="vocab-stats"><span class="stat-correct">✓ ${v.correct||0}</span><span class="stat-wrong">✗ ${v.wrong||0}</span><span>Added ${v.dateAdded}</span></div>
       <div class="vocab-details" id="exp-${idx}">
         ${v.example?`<div class="detail-label">Example</div><div class="detail-val">${v.example}</div>`:''}
         ${v.usage?`<div class="detail-label">Usage</div><div class="detail-val">${v.usage}</div>`:''}
@@ -580,14 +578,20 @@ function renderList() {
 function toggleExpand(id) { document.getElementById(id).classList.toggle('open'); }
 function updateStats() {
   document.getElementById('stat-total').textContent = vocab.length;
-  document.getElementById('stat-due').textContent = vocab.filter(isDue).length;
-  document.getElementById('stat-mastered').textContent = vocab.filter(v => (v.correct||0) >= 5).length;
+  document.getElementById('stat-due').textContent = vocab.filter(isDueToday).length;
+  // Mastered = completed all 6 review cycles (90+ days since registration)
+  document.getElementById('stat-mastered').textContent = vocab.filter(v => {
+    if (!v.dateAdded) return false;
+    const registered = new Date(v.dateAdded); registered.setHours(0,0,0,0);
+    const now = new Date(); now.setHours(0,0,0,0);
+    return Math.round((now - registered) / 86400000) > 90;
+  }).length;
 }
 function deleteWord(idx) {
   if (!confirm('Delete this word?')) return;
   const v = vocab[idx];
   vocab.splice(idx, 1); save(); renderList(); updateStats();
-  sheetsSend({ action: 'delete', word: v.word, dateAdded: v.dateAdded });
+  sheetsSend({ action: 'delete', word: v.word });
 }
 function openEdit(idx) {
   const v = vocab[idx]; if (!v) return;
@@ -604,7 +608,6 @@ function saveEdit() {
   const idx = parseInt(document.getElementById('edit-idx').value);
   const v = vocab[idx]; if (!v) return;
   const originalWord = v.word;
-  const originalDate = v.dateAdded;
   v.word = document.getElementById('edit-word').value.trim();
   v.type = document.getElementById('edit-type').value;
   v.definition = document.getElementById('edit-def').value.trim();
@@ -612,12 +615,13 @@ function saveEdit() {
   v.usage = document.getElementById('edit-usage').value.trim();
   v.notes = document.getElementById('edit-notes').value.trim();
   save(); closeModal('modal-edit'); renderList();
+  // Use originalWord to find the row in Sheets
   sheetsSend({
-    action: 'update', originalWord, originalDate,
+    action: 'update',
+    originalWord: originalWord,
     word: v.word, type: v.type, definition: v.definition,
     example: v.example, usage: v.usage, notes: v.notes,
-    dateAdded: v.dateAdded, correct: v.correct || 0,
-    wrong: v.wrong || 0, lastReview: v.lastReview || '', nextReview: v.nextReview || ''
+    dateAdded: v.dateAdded, correct: v.correct || 0, wrong: v.wrong || 0
   });
   showToast('✅ Updated and synced!');
 }
@@ -656,14 +660,14 @@ function renderCustomSelectList() {
     if (customFilter === 'word' && v.type !== 'word') return false;
     if (customFilter === 'idiom' && v.type !== 'idiom') return false;
     if (customFilter === 'collocation' && v.type !== 'collocation') return false;
-    if (customFilter === 'due' && !isDue(v)) return false;
+    if (customFilter === 'due' && !isDueToday(v)) return false;
     if (search && !v.word.toLowerCase().includes(search) && !v.definition.toLowerCase().includes(search)) return false;
     return true;
   });
   const c = document.getElementById('custom-select-list');
   c.innerHTML = items.length
     ? items.map(v => {
-        const k = vkey(v);
+        const k = v.word + '|||' + v.dateAdded;
         const cid = 'chk-' + k.replace(/[^a-zA-Z0-9]/g,'_');
         return `<div class="select-item" onclick="toggleSel('${k}','${cid}',0)">
           <div class="select-checkbox" id="${cid}"></div>
@@ -677,7 +681,7 @@ function renderCustomSelectList() {
     if (chk) { chk.classList.add('checked'); chk.textContent = '✓'; }
   });
 }
-function setSaveSetFilter(f, el) {
+function setSsFilter(f, el) {
   ssFilter = f;
   document.querySelectorAll('#save-set-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); renderSaveSetList();
@@ -688,14 +692,14 @@ function renderSaveSetList() {
     if (ssFilter === 'word' && v.type !== 'word') return false;
     if (ssFilter === 'idiom' && v.type !== 'idiom') return false;
     if (ssFilter === 'collocation' && v.type !== 'collocation') return false;
-    if (ssFilter === 'due' && !isDue(v)) return false;
+    if (ssFilter === 'due' && !isDueToday(v)) return false;
     if (search && !v.word.toLowerCase().includes(search)) return false;
     return true;
   });
   const c = document.getElementById('save-set-select-list');
   c.innerHTML = items.length
     ? items.map(v => {
-        const k = vkey(v);
+        const k = v.word + '|||' + v.dateAdded;
         const cid = 'ss-' + k.replace(/[^a-zA-Z0-9]/g,'_');
         return `<div class="select-item" onclick="toggleSel('${k}','${cid}',1)">
           <div class="select-checkbox" id="${cid}"></div>
@@ -716,7 +720,7 @@ function toggleSel(key, chkId, mode) {
   else { arr.push(key); chk.classList.add('checked'); chk.textContent = '✓'; }
 }
 function startMode(mode) {
-  const q = mode === 'today' ? vocab.filter(isDue) : vocab;
+  const q = mode === 'today' ? vocab.filter(isDueToday) : vocab;
   if (!q.length) { showToast('🎉 No words due today!'); return; }
   startSession(q);
 }
@@ -731,7 +735,7 @@ function openCustomSelect() {
 function startCustomSession() {
   if (!selectedWords.length) { showToast('Select at least one word.'); return; }
   closeModal('modal-custom');
-  startSession(vocab.filter(v => selectedWords.includes(vkey(v))));
+  startSession(vocab.filter(v => selectedWords.includes(v.word + '|||' + v.dateAdded)));
 }
 function toggleSavedSets() {
   const s = document.getElementById('saved-sets-section');
@@ -743,7 +747,7 @@ function renderSavedSets() {
   c.innerHTML = savedSets.map((s, i) => `<div class="set-item"><div><div class="set-name">${s.name}</div><div class="set-count">${s.ids.length} words · ${s.created}</div></div><div style="display:flex;gap:6px;"><button class="btn btn-sm btn-primary" onclick="startSetSession(${i})">▶ Start</button><button class="btn btn-sm btn-danger" onclick="deleteSet(${i})">🗑️</button></div></div>`).join('');
 }
 function startSetSession(i) {
-  const q = vocab.filter(v => savedSets[i].ids.includes(vkey(v)));
+  const q = vocab.filter(v => savedSets[i].ids.includes(v.word + '|||' + v.dateAdded));
   document.getElementById('saved-sets-section').style.display = 'none'; startSession(q);
 }
 function deleteSet(i) { if (!confirm('Delete this set?')) return; savedSets.splice(i,1); saveSets(); renderSavedSets(); }
@@ -798,7 +802,7 @@ function prevCard() {
   if (fcIndex <= 0) return;
   const last = fcAnswered.pop();
   if (last !== undefined) {
-    const entry = vocab.find(x => vkey(x) === vkey(fcQueue[fcIndex-1]));
+    const entry = vocab.find(x => x.word === fcQueue[fcIndex-1].word && x.dateAdded === fcQueue[fcIndex-1].dateAdded);
     if (entry) {
       if (last === true) { entry.correct = Math.max(0, (entry.correct||1) - 1); fcCorrect--; }
       else { entry.wrong = Math.max(0, (entry.wrong||1) - 1); fcWrong--; }
@@ -808,20 +812,18 @@ function prevCard() {
   fcIndex--; showCard();
 }
 function recordAnswer(correct) {
-  const entry = vocab.find(x => vkey(x) === vkey(fcQueue[fcIndex]));
+  const entry = vocab.find(x => x.word === fcQueue[fcIndex].word && x.dateAdded === fcQueue[fcIndex].dateAdded);
   if (entry) {
     if (correct) { entry.correct = (entry.correct || 0) + 1; fcCorrect++; }
     else { entry.wrong = (entry.wrong || 0) + 1; fcWrong++; }
-    entry.lastReview = today();
-    entry.nextReview = calcNextReview(entry);
     save(); fcAnswered.push(correct);
+    // Sync correct/wrong to Sheets
     sheetsSend({
       action: 'update',
-      originalWord: entry.word, originalDate: entry.dateAdded,
+      originalWord: entry.word,
       word: entry.word, type: entry.type, definition: entry.definition,
       example: entry.example || '', usage: entry.usage || '', notes: entry.notes || '',
-      dateAdded: entry.dateAdded, correct: entry.correct, wrong: entry.wrong,
-      lastReview: entry.lastReview, nextReview: entry.nextReview
+      dateAdded: entry.dateAdded, correct: entry.correct, wrong: entry.wrong
     });
   }
   fcIndex++;
@@ -835,10 +837,7 @@ function pauseSession() {
   updateResumeBanner();
   showToast('⏸️ Session paused. You can resume anytime.');
 }
-function endSession() {
-  clearSession();
-  backToHome();
-}
+function endSession() { clearSession(); backToHome(); }
 function showComplete() {
   clearSession();
   document.getElementById('fc-session').style.display = 'none';
