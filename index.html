@@ -64,13 +64,19 @@
   .filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
   .filter-btn{padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1.5px solid var(--blue-200);background:white;color:var(--gray-500);cursor:pointer;font-family:'Nunito',sans-serif;transition:var(--t);}
   .filter-btn.active{background:var(--blue-600);color:white;border-color:var(--blue-600);}
-  .fc-mode-select{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px;}
-  .fc-mode-card{background:white;border-radius:var(--radius);padding:18px 20px;border:2px solid var(--blue-100);cursor:pointer;transition:var(--t);display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(37,99,235,0.06);}
+  .fc-mode-select{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+  .fc-mode-card{background:white;border-radius:var(--radius);padding:18px 16px;border:2px solid var(--blue-100);cursor:pointer;transition:var(--t);display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(37,99,235,0.06);}
   .fc-mode-card:hover,.fc-mode-card:active{border-color:var(--blue-400);background:var(--blue-50);}
-  .fc-mode-icon{font-size:1.8rem;flex-shrink:0;}
-  .fc-mode-title{font-size:1rem;font-weight:800;color:var(--blue-700);margin-bottom:2px;}
-  .fc-mode-desc{font-size:0.82rem;color:var(--gray-500);}
+  .fc-mode-icon{font-size:1.6rem;flex-shrink:0;}
+  .fc-mode-title{font-size:0.92rem;font-weight:800;color:var(--blue-700);margin-bottom:2px;}
+  .fc-mode-desc{font-size:0.76rem;color:var(--gray-500);}
   .resume-banner{background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;color:white;display:flex;align-items:center;gap:12px;}
+  .past-review-panel{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px;border:1.5px solid var(--blue-100);}
+  .past-review-title{font-size:1rem;font-weight:800;color:var(--blue-700);margin-bottom:4px;}
+  .past-review-sub{font-size:0.82rem;color:var(--gray-500);margin-bottom:14px;}
+  .past-date-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .past-date-pill{padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:700;border:1.5px solid var(--blue-200);background:white;color:var(--gray-500);cursor:pointer;font-family:'Nunito',sans-serif;transition:var(--t);}
+  .past-date-pill:active{background:var(--blue-100);}
   .flashcard{background:white;border-radius:20px;padding:36px 24px;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:var(--shadow-lg);border:2px solid var(--blue-100);cursor:pointer;transition:var(--t);margin-bottom:20px;}
   .flashcard:active{transform:scale(0.98);}
   .fc-label{font-size:0.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--blue-300);margin-bottom:10px;}
@@ -135,7 +141,7 @@
   .loading-spinner{width:40px;height:40px;border:4px solid var(--blue-100);border-top-color:var(--blue-600);border-radius:50%;animation:spin 0.8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg)}}
   .loading-text{font-size:0.95rem;font-weight:700;color:var(--blue-600);}
-  @media(min-width:640px){.fc-mode-select{grid-template-columns:1fr 1fr 1fr;}.form-row{grid-template-columns:1fr 1fr 1fr;}}
+  @media(min-width:640px){.fc-mode-select{grid-template-columns:1fr 1fr;}.form-row{grid-template-columns:1fr 1fr 1fr;}}
 </style>
 </head>
 <body>
@@ -222,16 +228,34 @@
     </div>
     <div class="fc-mode-select">
       <div class="fc-mode-card" onclick="startMode('today')"><div class="fc-mode-icon">🔄</div><div><div class="fc-mode-title">Today's Review</div><div class="fc-mode-desc">Based on registration date</div></div></div>
+      <div class="fc-mode-card" onclick="openPastReview()"><div class="fc-mode-icon">📅</div><div><div class="fc-mode-title">Past Review</div><div class="fc-mode-desc">Review a past date's words</div></div></div>
       <div class="fc-mode-card" onclick="openCustomSelect()"><div class="fc-mode-icon">✏️</div><div><div class="fc-mode-title">Custom Selection</div><div class="fc-mode-desc">Pick words from your list</div></div></div>
-      <div class="fc-mode-card" onclick="toggleSavedSets()"><div class="fc-mode-icon">📚</div><div><div class="fc-mode-title">Saved Sets</div><div class="fc-mode-desc">Study a saved flashcard set</div></div></div>
+      <div class="fc-mode-card" onclick="toggleSavedSets()"><div class="fc-mode-icon">📚</div><div><div class="fc-mode-title">Saved Sets</div><div class="fc-mode-desc">Study a saved set</div></div></div>
     </div>
-    <div id="saved-sets-section" style="display:none;">
-      <div class="card">
-        <div class="card-title">📚 Saved Sets</div>
-        <div id="sets-list-container"></div>
-        <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="openSaveSetModal()">+ Save New Set</button>
-      </div>
-    </div>
+
+```
+<!-- Past Review Panel -->
+<div id="past-review-panel" style="display:none;" class="past-review-panel">
+  <div class="past-review-title">📅 Past Review</div>
+  <div class="past-review-sub">Select a date to review words that were due on that day.</div>
+  <div class="past-date-pills" id="past-date-pills"></div>
+  <div class="form-group">
+    <label class="form-label">Or pick a specific date</label>
+    <input type="date" class="form-input" id="past-date-picker">
+  </div>
+  <div id="past-review-count" style="font-size:0.85rem;color:var(--gray-500);margin-bottom:12px;"></div>
+  <button class="btn btn-primary btn-full" onclick="startPastReview()">Start ▶</button>
+</div>
+
+<div id="saved-sets-section" style="display:none;">
+  <div class="card">
+    <div class="card-title">📚 Saved Sets</div>
+    <div id="sets-list-container"></div>
+    <button class="btn btn-secondary btn-full" style="margin-top:8px;" onclick="openSaveSetModal()">+ Save New Set</button>
+  </div>
+</div>
+```
+
   </div>
 
   <div id="fc-session" style="display:none;">
@@ -377,7 +401,6 @@ let fcQueue = [], fcIndex = 0, fcCorrect = 0, fcWrong = 0, fcAnswered = [];
 let selectedWords = [];
 let saveSetSelected = [];
 
-// Spaced repetition intervals in days from registration date
 const SR_DAYS = [1, 3, 7, 14, 30, 90];
 
 // ===== HELPERS =====
@@ -406,23 +429,80 @@ function loadSession() {
 }
 function clearSession() { localStorage.removeItem('vm_fc_session'); }
 function today() { return new Date().toISOString().split('T')[0]; }
+function formatDate(d) { if (!d) return ''; return String(d).split('T')[0]; }
 function nowStr() {
   const d = new Date();
   return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' +
     d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ===== SPACED REPETITION (date-based) =====
-// Returns true if the word should appear in Today's Review
-// Based on days since registration: 1, 3, 7, 14, 30, 90
-function isDueToday(v) {
+// ===== SPACED REPETITION =====
+function isDueOnDate(v, dateStr) {
   if (!v.dateAdded) return false;
-  const registered = new Date(v.dateAdded);
+  const registered = new Date(formatDate(v.dateAdded));
   registered.setHours(0,0,0,0);
-  const now = new Date();
-  now.setHours(0,0,0,0);
-  const daysSince = Math.round((now - registered) / 86400000);
+  const target = new Date(dateStr);
+  target.setHours(0,0,0,0);
+  const daysSince = Math.round((target - registered) / 86400000);
   return SR_DAYS.includes(daysSince);
+}
+function isDueToday(v) { return isDueOnDate(v, today()); }
+
+// ===== PAST REVIEW =====
+function openPastReview() {
+  // Hide other panels
+  document.getElementById('saved-sets-section').style.display = 'none';
+  const panel = document.getElementById('past-review-panel');
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  // Generate past date pills (last 7 days that had due words)
+  const pills = document.getElementById('past-date-pills');
+  pills.innerHTML = '';
+  const pastDates = [];
+  for (let i = 1; i <= 30; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const count = vocab.filter(v => isDueOnDate(v, dateStr)).length;
+    if (count > 0) pastDates.push({ dateStr, count });
+    if (pastDates.length >= 7) break;
+  }
+  if (pastDates.length === 0) {
+    pills.innerHTML = '<div style="font-size:0.82rem;color:var(--gray-400);">No past review dates found.</div>';
+  } else {
+    pastDates.forEach(({ dateStr, count }) => {
+      const btn = document.createElement('button');
+      btn.className = 'past-date-pill';
+      btn.textContent = dateStr + ' (' + count + ')';
+      btn.onclick = () => {
+        document.getElementById('past-date-picker').value = dateStr;
+        updatePastReviewCount();
+      };
+      pills.appendChild(btn);
+    });
+  }
+
+  // Set picker to yesterday by default
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  document.getElementById('past-date-picker').value = yesterday.toISOString().split('T')[0];
+  updatePastReviewCount();
+}
+function updatePastReviewCount() {
+  const dateStr = document.getElementById('past-date-picker').value;
+  if (!dateStr) return;
+  const count = vocab.filter(v => isDueOnDate(v, dateStr)).length;
+  document.getElementById('past-review-count').textContent =
+    count > 0 ? count + ' word(s) were due on ' + dateStr : 'No words were due on ' + dateStr + '.';
+}
+function startPastReview() {
+  const dateStr = document.getElementById('past-date-picker').value;
+  if (!dateStr) { showToast('Please select a date.'); return; }
+  const q = vocab.filter(v => isDueOnDate(v, dateStr));
+  if (!q.length) { showToast('No words were due on ' + dateStr + '.'); return; }
+  document.getElementById('past-review-panel').style.display = 'none';
+  startSession(q);
 }
 
 // ===== SHEETS =====
@@ -433,7 +513,6 @@ function sheetsSend(params) {
     .join('&');
   fetch(url).then(r => r.json()).catch(() => null);
 }
-
 async function loadFromSheets() {
   if (!sheetsUrl) { showToast('Please connect Google Sheets first.'); return; }
   document.getElementById('loading-overlay').classList.add('show');
@@ -448,7 +527,7 @@ async function loadFromSheets() {
         example: String(v.example || '').trim(),
         usage: String(v.usage || '').trim(),
         notes: String(v.notes || '').trim(),
-        dateAdded: String(v.dateAdded || today()).trim(),
+        dateAdded: formatDate(String(v.dateAdded || today()).trim()),
         correct: parseInt(v.correct) || 0,
         wrong: parseInt(v.wrong) || 0
       })).filter(v => v.word);
@@ -459,13 +538,10 @@ async function loadFromSheets() {
       renderList(); updateStats();
       updateSheetsBadge(true);
       showToast('✅ Synced! ' + vocab.length + ' words loaded.');
-    } else {
-      showToast('⚠️ No data found in Sheets.');
-    }
+    } else { showToast('⚠️ No data found in Sheets.'); }
   } catch(e) { showToast('⚠️ Sync failed. Check connection.'); }
   document.getElementById('loading-overlay').classList.remove('show');
 }
-
 function updateSyncTimeDisplay() {
   const el = document.getElementById('sync-time-display');
   if (el) el.textContent = lastSyncTime ? 'Last sync: ' + lastSyncTime : '';
@@ -579,12 +655,11 @@ function toggleExpand(id) { document.getElementById(id).classList.toggle('open')
 function updateStats() {
   document.getElementById('stat-total').textContent = vocab.length;
   document.getElementById('stat-due').textContent = vocab.filter(isDueToday).length;
-  // Mastered = completed all 6 review cycles (90+ days since registration)
   document.getElementById('stat-mastered').textContent = vocab.filter(v => {
     if (!v.dateAdded) return false;
-    const registered = new Date(v.dateAdded); registered.setHours(0,0,0,0);
+    const reg = new Date(formatDate(v.dateAdded)); reg.setHours(0,0,0,0);
     const now = new Date(); now.setHours(0,0,0,0);
-    return Math.round((now - registered) / 86400000) > 90;
+    return Math.round((now - reg) / 86400000) > 90;
   }).length;
 }
 function deleteWord(idx) {
@@ -615,14 +690,9 @@ function saveEdit() {
   v.usage = document.getElementById('edit-usage').value.trim();
   v.notes = document.getElementById('edit-notes').value.trim();
   save(); closeModal('modal-edit'); renderList();
-  // Use originalWord to find the row in Sheets
-  sheetsSend({
-    action: 'update',
-    originalWord: originalWord,
-    word: v.word, type: v.type, definition: v.definition,
-    example: v.example, usage: v.usage, notes: v.notes,
-    dateAdded: v.dateAdded, correct: v.correct || 0, wrong: v.wrong || 0
-  });
+  sheetsSend({ action: 'update', originalWord, word: v.word, type: v.type,
+    definition: v.definition, example: v.example, usage: v.usage, notes: v.notes,
+    dateAdded: v.dateAdded, correct: v.correct || 0, wrong: v.wrong || 0 });
   showToast('✅ Updated and synced!');
 }
 
@@ -635,17 +705,12 @@ function updateResumeBanner() {
     const remaining = session.fcQueue.length - session.fcIndex;
     document.getElementById('resume-info').textContent =
       remaining + ' cards remaining · ' + session.fcCorrect + ' correct, ' + session.fcWrong + ' incorrect';
-  } else {
-    banner.style.display = 'none';
-  }
+  } else { banner.style.display = 'none'; }
 }
 function resumeSession() {
-  const session = loadSession();
-  if (!session) return;
-  fcQueue = session.fcQueue;
-  fcIndex = session.fcIndex;
-  fcCorrect = session.fcCorrect;
-  fcWrong = session.fcWrong;
+  const session = loadSession(); if (!session) return;
+  fcQueue = session.fcQueue; fcIndex = session.fcIndex;
+  fcCorrect = session.fcCorrect; fcWrong = session.fcWrong;
   fcAnswered = session.fcAnswered || [];
   showSessionUI(); showCard();
 }
@@ -726,6 +791,8 @@ function startMode(mode) {
 }
 function openCustomSelect() {
   if (!vocab.length) { showToast('No vocabulary saved yet.'); return; }
+  document.getElementById('past-review-panel').style.display = 'none';
+  document.getElementById('saved-sets-section').style.display = 'none';
   selectedWords = []; customFilter = 'all';
   document.getElementById('custom-search').value = '';
   document.querySelectorAll('#custom-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
@@ -738,6 +805,7 @@ function startCustomSession() {
   startSession(vocab.filter(v => selectedWords.includes(v.word + '|||' + v.dateAdded)));
 }
 function toggleSavedSets() {
+  document.getElementById('past-review-panel').style.display = 'none';
   const s = document.getElementById('saved-sets-section');
   s.style.display = s.style.display === 'none' ? 'block' : 'none'; renderSavedSets();
 }
@@ -817,14 +885,10 @@ function recordAnswer(correct) {
     if (correct) { entry.correct = (entry.correct || 0) + 1; fcCorrect++; }
     else { entry.wrong = (entry.wrong || 0) + 1; fcWrong++; }
     save(); fcAnswered.push(correct);
-    // Sync correct/wrong to Sheets
-    sheetsSend({
-      action: 'update',
-      originalWord: entry.word,
-      word: entry.word, type: entry.type, definition: entry.definition,
-      example: entry.example || '', usage: entry.usage || '', notes: entry.notes || '',
-      dateAdded: entry.dateAdded, correct: entry.correct, wrong: entry.wrong
-    });
+    sheetsSend({ action: 'update', originalWord: entry.word, word: entry.word,
+      type: entry.type, definition: entry.definition, example: entry.example || '',
+      usage: entry.usage || '', notes: entry.notes || '', dateAdded: entry.dateAdded,
+      correct: entry.correct, wrong: entry.wrong });
   }
   fcIndex++;
   if (fcIndex >= fcQueue.length) showComplete(); else showCard();
@@ -834,6 +898,7 @@ function pauseSession() {
   document.getElementById('fc-session').style.display = 'none';
   document.getElementById('fc-home').style.display = 'block';
   document.getElementById('saved-sets-section').style.display = 'none';
+  document.getElementById('past-review-panel').style.display = 'none';
   updateResumeBanner();
   showToast('⏸️ Session paused. You can resume anytime.');
 }
@@ -856,6 +921,7 @@ function backToHome() {
   document.getElementById('fc-complete').style.display = 'none';
   document.getElementById('fc-home').style.display = 'block';
   document.getElementById('saved-sets-section').style.display = 'none';
+  document.getElementById('past-review-panel').style.display = 'none';
   updateResumeBanner();
 }
 
@@ -882,6 +948,8 @@ function showToast(msg) {
 if (sheetsUrl) updateSheetsBadge(true);
 updateSyncTimeDisplay();
 renderList(); updateStats();
+// Add date picker change listener
+document.getElementById('past-date-picker').addEventListener('change', updatePastReviewCount);
 </script>
 
 </body>
