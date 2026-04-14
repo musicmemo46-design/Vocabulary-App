@@ -428,7 +428,13 @@ function loadSession() {
   } catch(e) { return null; }
 }
 function clearSession() { localStorage.removeItem('vm_fc_session'); }
-function today() { return new Date().toISOString().split('T')[0]; }
+function today() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return year + '-' + month + '-' + day;
+}
 function formatDate(d) { if (!d) return ''; return String(d).split('T')[0]; }
 function nowStr() {
   const d = new Date();
